@@ -13,3 +13,7 @@ v15
 /Client/Client.csproj
 /Client/Client.sln
 /Client/Assets/Scripts/Common
+/Common/Swift/*.meta
+/Common/Swift/Components/*.meta
+/Common/Swift/Core/*.meta
+/Common/Swift/Net/*.meta

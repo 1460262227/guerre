@@ -9,5 +9,5 @@ using System;
 public class Airplane : MovableObject
 {
     // 唯一 ID
-    public string ID;
+    public string ID { get; set; }
 }

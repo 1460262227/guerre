@@ -10,13 +10,13 @@ using System;
 public class MovableObject : MonoBehaviour
 {
     // 移动速率
-    public float Velocity = 0;
+    public float Velocity { get; set; }
 
     // 角速度
-    public float TurnV = 0;
+    public float TurnV { get; set; }
 
     // 转向目标方向
-    public Vec2 Turn2Dir = Vec2.Right;
+    public Vec2 Turn2Dir { get; set; }
 
     // 当前位置
     public Vec2 Pos
