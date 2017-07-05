@@ -1,0 +1,15 @@
+Library
+v14
+Temp
+v15
+/Server/Server/obj/Debug/netcoreapp1.1/*.cache
+/Server/Server/obj
+/Server/Server/bin
+/Server/Server/Common
+/Server/Server/Server.csproj.user
+/Client/Client.csproj.user
+/Client/Client.userprefs
+/Common/*.meta
+/Client/Client.csproj
+/Client/Client.sln
+/Client/Assets/Scripts/Common
