@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Guerre;
+using Swift;
+using Swift.Math;
 
 // 一个游戏世界代表一局游戏
 public class GameWorld : MonoBehaviour {
@@ -165,8 +167,8 @@ public class GameWorld : MonoBehaviour {
         cmds.Add(() => { DelAirplane(id); });
     }
 
-    // 给定时间编号开始，到一定时间编号长度内，无指令
-    public void Skip(int t, int tLen = 1)
+    // 给定时间编号开始，到一定时间编号长度内，空指令
+    public void Dumb(int t, int tLen = 1)
     {
         FC.For(t, t + tLen, (i) => { RetrieveCmds(i).Add(null); });
     }

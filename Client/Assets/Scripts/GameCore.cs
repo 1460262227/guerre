@@ -20,8 +20,14 @@ public class GameCore : Core
     public void Init()
     {
         // 网络核心
-        NetCore nc = new NetCore();
+        var nc = new NetCore();
         core.Add("NetCore", nc);
+
+        // 消息处理模块
+        var mm = new MessageHandler();
+        core.Add("MessageHandler", mm);
+        APIs.SendImpl = mm.Send;
+        APIs.RequestImpl = mm.Request;
     }
 
     // 连接服务器
@@ -34,7 +40,7 @@ public class GameCore : Core
 
         nc.Connect2Peer(ip, port, (Connection conn, string reason) =>
         {
-            ResetAllConnection(conn);
+            srvConn = conn;
             callback(conn, reason);
         });
     }
@@ -56,22 +62,6 @@ public class GameCore : Core
     }
 
     #region 保护部分
-
-    // 等待服务器连接成功后，设置好所有网络相关模块的连接对象
-    void ResetAllConnection(Connection conn)
-    {
-        srvConn = conn;
-        Component[] arr = core.All;
-        for (int i = 0; i < arr.Length; i++)
-        {
-            Component c = arr[i];
-            if (c is PortAgent)
-            {
-                PortAgent pa = c as PortAgent;
-                pa.Setup(conn);
-            }
-        }
-    }
 
     Core core = new Core();
 

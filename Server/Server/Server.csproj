@@ -35,6 +35,9 @@
     <Reference Include="log4net">
       <HintPath>.\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="mysql.data">
+      <HintPath>.\mysql.data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,8 +49,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Airplane.cs" />
-    <Compile Include="Common\Ext.cs" />
-    <Compile Include="Common\FC.cs" />
+    <Compile Include="Common\Player\PlayerInfo.cs" />
+    <Compile Include="Common\Swift\BufferExtension.cs" />
+    <Compile Include="Common\Swift\ISerializable.cs" />
+    <Compile Include="Common\Swift\Math\MathEx.cs" />
+    <Compile Include="Common\Swift\FC.cs" />
     <Compile Include="Common\Swift\Components\CoroutineManager.cs" />
     <Compile Include="Common\Swift\Core\Component.cs" />
     <Compile Include="Common\Swift\Core\ComponentContainer.cs" />
@@ -59,16 +65,32 @@
     <Compile Include="Common\Swift\Net\NetCore.cs" />
     <Compile Include="Common\Swift\Net\NetUtils.cs" />
     <Compile Include="Common\Swift\Net\Peer.cs" />
-    <Compile Include="Common\Swift\Net\Port.cs" />
     <Compile Include="Common\Swift\RingBuffer.cs" />
+    <Compile Include="Common\Swift\SerializableData.cs" />
     <Compile Include="Common\Swift\Utils.cs" />
     <Compile Include="Common\Swift\WriteBuffer.cs" />
-    <Compile Include="Common\Vec2.cs" />
+    <Compile Include="Common\Swift\Math\Vec2.cs" />
+    <Compile Include="Common\Swift\Net\MessageHandler.cs" />
+    <Compile Include="Login\LoginManager.cs" />
     <Compile Include="Log\ServerLogger.cs" />
+    <Compile Include="RoomService\GRApis.cs" />
+    <Compile Include="ServerMessageHandlers.cs" />
+    <Compile Include="Player\Player.cs" />
+    <Compile Include="Player\PlayerContainer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoomService\GameRoom.cs" />
+    <Compile Include="RoomService\GameRoomContainer.cs" />
+    <Compile Include="RoomService\GameRoomManager.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerBuilder.cs" />
+    <Compile Include="Session\Session.cs" />
+    <Compile Include="Session\SessionContainer.cs" />
+    <Compile Include="Storage\DataContainer.cs" />
+    <Compile Include="Storage\DataItem.cs" />
+    <Compile Include="Storage\IAsyncPersistence.cs" />
+    <Compile Include="Storage\MySqlDbPersistence.cs" />
+    <Compile Include="UniqueDataItem.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,17 @@ namespace Swift
             Array.Copy(src, 0, data, id, src.Length);
         }
 
+        public int ReserveInt()
+        {
+            return Reserve(sizeof(int));
+        }
+
+        public void UnreserveInt(int id, int v)
+        {
+            var src = BitConverter.GetBytes(WriteToNetOrder ? IPAddress.HostToNetworkOrder(v) : v);
+            Unreserve(id, src);
+        }
+
         public void Write(byte v)
         {
             MakeSureCapacity(1);
@@ -140,11 +151,11 @@ namespace Swift
             Write(BitConverter.GetBytes(WriteToNetOrder ? IPAddress.HostToNetworkOrder(v) : v));
         }
 
-		public long PeekLong(int offset)
-		{
-			long v = BitConverter.ToInt64(data, offset);
-			return WriteToNetOrder ? IPAddress.NetworkToHostOrder(v) : v;
-		}
+        public long PeekLong(int offset)
+        {
+            long v = BitConverter.ToInt64(data, offset);
+            return WriteToNetOrder ? IPAddress.NetworkToHostOrder(v) : v;
+        }
 
         public void Write(long[] arr)
         {
@@ -156,24 +167,24 @@ namespace Swift
                 foreach (long v in arr)
                     Write(v);
             }
-		}
-		public void Write(ulong _v)
-		{
-			long v = (long)_v;
-			Write(BitConverter.GetBytes(WriteToNetOrder ? IPAddress.HostToNetworkOrder(v) : v));
-		}
-		
-		public void Write(ulong[] arr)
-		{
-			if (arr == null)
-				Write(-1);
-			else
-			{
-				Write(arr.Length);
-				foreach (ulong v in arr)
-					Write(v);
-			}
-		}
+        }
+        public void Write(ulong _v)
+        {
+            long v = (long)_v;
+            Write(BitConverter.GetBytes(WriteToNetOrder ? IPAddress.HostToNetworkOrder(v) : v));
+        }
+
+        public void Write(ulong[] arr)
+        {
+            if (arr == null)
+                Write(-1);
+            else
+            {
+                Write(arr.Length);
+                foreach (ulong v in arr)
+                    Write(v);
+            }
+        }
 
         public void Write(float v)
         {
@@ -284,7 +295,7 @@ namespace Swift
         int wPos = 0;
 
         private bool _IsUsing = true;
-        public bool IsUsing 
+        public bool IsUsing
         {
             get { return _IsUsing; }
             set { _IsUsing = value; }

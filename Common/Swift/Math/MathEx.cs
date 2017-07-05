@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Guerre
+namespace Swift.Math
 {
     // 零碎扩展
-    public static class Ext
+    public static class MathEx
     {
         public const float Pi = (float) System.Math.PI;
         public const float HalfPi = Pi / 2;
@@ -22,12 +22,12 @@ namespace Guerre
             var x = v.x / len;
             var y = v.y / len;
 
-            if (Math.Abs(x) <= float.Epsilon)
+            if (System.Math.Abs(x) <= float.Epsilon)
                 return y > 0 ? HalfPi : -HalfPi;
             else
             {
                 var tanValue = y / x;
-                var arc = (float)Math.Atan(tanValue);
+                var arc = (float)System.Math.Atan(tanValue);
 
                 if (x < 0)
                     arc += Pi;

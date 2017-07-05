@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Guerre
+namespace Swift.Math
 {
     // 2D 浮点向量
     public struct Vec2
@@ -20,7 +20,7 @@ namespace Guerre
         {
             get
             {
-                return (float)Math.Sqrt(x * x + y * y);
+                return (float)System.Math.Sqrt(x * x + y * y);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Guerre
         public void Normalize()
         {
             var len = Length;
-            if (Math.Abs(len) > float.Epsilon)
+            if (System.Math.Abs(len) > float.Epsilon)
             {
                 x /= len;
                 y /= len;

@@ -42,6 +42,16 @@ namespace Swift
             FuncAddComponent(str, com);
         }
 
+        public void AddChildComponent(string str, Component com)
+        {
+            FuncAddComponent(name + "/" + str, com);
+        }
+
+        public Component RemoveChildComponent(string str)
+        {
+            return FuncRemoveComponent(name + "/" + str);
+        }
+
         // 本对象被加入容器
         public virtual void OnAdded()
         {

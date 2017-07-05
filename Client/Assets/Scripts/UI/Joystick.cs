@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Guerre;
 using System;
+using Swift;
+using Swift.Math;
 
 public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     

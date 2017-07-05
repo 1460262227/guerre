@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using Guerre;
 using System;
+using Swift;
+using Swift.Math;
 
 // 可移动的物体
 public class MovableObject : MonoBehaviour
@@ -59,7 +60,7 @@ public class MovableObject : MonoBehaviour
         }
     }
 
-    // 沿已规划路径或当前方向移动一段距离
+    // 沿当前方向移动一段距离
     public void MoveForward(float te)
     {
         var dist = te * Velocity;

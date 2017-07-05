@@ -22,6 +22,17 @@ namespace Swift
             WriteToNetOrder = writeToNetOrder;
         }
 
+        public RingBuffer(bool readFromNetOrder, bool writeToNetOrder, byte[] data)
+            : this(readFromNetOrder, writeToNetOrder)
+        {
+            Write(data);
+        }
+
+        public RingBuffer(byte[] data)
+            : this(false, false, data)
+        {
+        }
+
         // 读操作是否执行从网络序到本地序的转换
         public bool ReadFromNetOrder
         {
@@ -184,25 +195,25 @@ namespace Swift
                 }
             }
         }
-		public void Write(ulong v)
-		{
-			Write ((long)v);
-		}
-		
-		public void Write(ulong[] arr)
-		{
-			lock (this)
-			{
-				if (arr == null)
-					Write(-1);
-				else
-				{
-					Write(arr.Length);
-					foreach (ulong v in arr)
-						Write(v);
-				}
-			}
-		}
+        public void Write(ulong v)
+        {
+            Write((long)v);
+        }
+
+        public void Write(ulong[] arr)
+        {
+            lock (this)
+            {
+                if (arr == null)
+                    Write(-1);
+                else
+                {
+                    Write(arr.Length);
+                    foreach (ulong v in arr)
+                        Write(v);
+                }
+            }
+        }
         public void Write(float v)
         {
             lock (this)
@@ -379,7 +390,7 @@ namespace Swift
                 {
                     v = ReadFromNetOrder
                          ? IPAddress.NetworkToHostOrder(Peek<int>(BitConverter.ToInt32, cnt))
-						 : Peek<int>(BitConverter.ToInt32, cnt);
+                         : Peek<int>(BitConverter.ToInt32, cnt);
                     return true;
                 }
             }
@@ -453,7 +464,7 @@ namespace Swift
             {
                 return ReadFromNetOrder
                         ? IPAddress.NetworkToHostOrder(Read<short>(BitConverter.ToInt16, sizeof(short)))
-						: Read<short>(BitConverter.ToInt16, sizeof(short));
+                        : Read<short>(BitConverter.ToInt16, sizeof(short));
             }
         }
 
@@ -480,7 +491,7 @@ namespace Swift
             {
                 return ReadFromNetOrder
                         ? IPAddress.NetworkToHostOrder(Read<int>(BitConverter.ToInt32, sizeof(int)))
-						: Read<int>(BitConverter.ToInt32, sizeof(int));
+                        : Read<int>(BitConverter.ToInt32, sizeof(int));
             }
         }
 
@@ -507,7 +518,7 @@ namespace Swift
             {
                 return ReadFromNetOrder
                         ? IPAddress.NetworkToHostOrder(Read<long>(BitConverter.ToInt64, sizeof(long)))
-						: Read<long>(BitConverter.ToInt64, sizeof(long));
+                        : Read<long>(BitConverter.ToInt64, sizeof(long));
             }
         }
 
@@ -526,28 +537,28 @@ namespace Swift
                     return arr;
                 }
             }
-		}
-		public ulong ReadULong()
-		{
-			return (ulong)ReadLong ();
-		}
-		
-		public ulong[] ReadULongArr()
-		{
-			lock (this)
-			{
-				int len = ReadInt();
-				if (len == -1)
-					return null;
-				else
-				{
-					ulong[] arr = new ulong[len];
-					for (int i = 0; i < len; i++)
-						arr[i] = ReadULong();
-					return arr;
-				}
-			}
-		}
+        }
+        public ulong ReadULong()
+        {
+            return (ulong)ReadLong();
+        }
+
+        public ulong[] ReadULongArr()
+        {
+            lock (this)
+            {
+                int len = ReadInt();
+                if (len == -1)
+                    return null;
+                else
+                {
+                    ulong[] arr = new ulong[len];
+                    for (int i = 0; i < len; i++)
+                        arr[i] = ReadULong();
+                    return arr;
+                }
+            }
+        }
 
         public float ReadFloat()
         {
@@ -628,7 +639,7 @@ namespace Swift
         {
             lock (this)
             {
-				int len = ReadInt();
+                int len = ReadInt();
 
                 if (len == -1)
                     return null;
@@ -665,47 +676,47 @@ namespace Swift
             }
         }
 
-//        public T Read<T>() where T : class, ISerializable, new()
-//        {
-//            bool noNull = ReadBool();
-//            if (!noNull)
-//                return default(T);
-//
-//            T t = new T();
-//            t.Deserialize(this);
-//            return t;
-//        }
-//
-//        public T[] ReadArr<T>() where T : class, ISerializable, new()
-//        {
-//            int len = ReadInt();
-//            T[] arr = new T[len];
-//            for (int i = 0; i < len; i++)
-//                arr[i] = Read<T>();
-//
-//            return arr;
-//        }
-//
-//        public ISerializable Read(Func<ISerializable> creator)
-//        {
-//            bool noNull = ReadBool();
-//            if (!noNull)
-//                return null;
-//
-//            ISerializable obj = creator();
-//            obj.Deserialize(this);
-//            return obj;
-//        }
-//
-//        public ISerializable[] ReadArr(Func<ISerializable> creator)
-//        {
-//            int cnt = ReadInt();
-//            ISerializable[] arr = new ISerializable[cnt];
-//            for (int i = 0; i < cnt; i++)
-//                arr[i] = Read(creator);
-//
-//            return arr;
-//        }
+        //        public T Read<T>() where T : class, ISerializable, new()
+        //        {
+        //            bool noNull = ReadBool();
+        //            if (!noNull)
+        //                return default(T);
+        //
+        //            T t = new T();
+        //            t.Deserialize(this);
+        //            return t;
+        //        }
+        //
+        //        public T[] ReadArr<T>() where T : class, ISerializable, new()
+        //        {
+        //            int len = ReadInt();
+        //            T[] arr = new T[len];
+        //            for (int i = 0; i < len; i++)
+        //                arr[i] = Read<T>();
+        //
+        //            return arr;
+        //        }
+        //
+        //        public ISerializable Read(Func<ISerializable> creator)
+        //        {
+        //            bool noNull = ReadBool();
+        //            if (!noNull)
+        //                return null;
+        //
+        //            ISerializable obj = creator();
+        //            obj.Deserialize(this);
+        //            return obj;
+        //        }
+        //
+        //        public ISerializable[] ReadArr(Func<ISerializable> creator)
+        //        {
+        //            int cnt = ReadInt();
+        //            ISerializable[] arr = new ISerializable[cnt];
+        //            for (int i = 0; i < cnt; i++)
+        //                arr[i] = Read(creator);
+        //
+        //            return arr;
+        //        }
 
         #endregion
 

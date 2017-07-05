@@ -300,7 +300,7 @@ namespace Swift
         #endregion
 
         // 默认 request 请求超时时间（秒）
-        public long RequestExpireTime = 5;
+        public long RequestExpireTime = 5000;
 
         // request 超时回调
         public Action<bool> OnRequestExpired = null;

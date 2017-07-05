@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Guerre;
+using Swift;
+using Swift.Math;
 
 public class Tester : MonoBehaviour {
 
@@ -10,7 +12,7 @@ public class Tester : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        GW.Add(0, "me", 0, Vec2.Zero, Ext.Up, 1f);
+        GW.Add(0, "me", 0, Vec2.Zero, MathEx.Up, 1f);
         StartCoroutine(PushTime(1));
     }
 

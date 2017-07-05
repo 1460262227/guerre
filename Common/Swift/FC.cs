@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Guerre
+namespace Swift
 {
     // 流程控制工具(flow control)
     public static class FC
