@@ -29,36 +29,58 @@ namespace Server
         // 添加玩家到房间
         public void AddPlayer(Player p)
         {
+            // 加入房间并广播消息
             ops.Add(() =>
             {
-                if (movableObjs.ContainsKey(p.ID))
-                    throw new Exception("player already exists in romm: " + p.ID + " => " + ID);
-
                 if (p.Room != null)
                     p.Room.RemovePlayer(p);
 
-                // 先同步房间信息
-                SyncRoomStatus(p.ID);
-
-                // 加入房间并广播消息
-                var a = new Airplane();
-                a.Init();
-                movableObjs[p.ID] = a;
                 p.Room = this;
 
-                Boardcast("AddIn", (buff) => 
-                {
-                    buff.Write(p.ID);
-                    buff.Write(a.Type);
-                    buff.Write(a.Pos.x);
-                    buff.Write(a.Pos.y);
-                    buff.Write(a.Velocity);
-                    buff.Write(a.Dir);
-                    buff.Write(a.Turn2Dir.x);
-                    buff.Write(a.Turn2Dir.y);
-                    buff.Write(a.TurnV);
-                });
+                // 同步房间信息
+                SyncRoomStatus(p.ID);
+
+                var a = new Airplane();
+                a.ID = p.ID;
+                AddObject(a);
             });
+        }
+
+        // 添加物件到房间
+        public void AddObject(MovableObject obj)
+        {
+            if (movableObjs.ContainsKey(obj.ID))
+                throw new Exception("object already exists in romm: " + obj.ID + " => " + ID);
+
+            // 加入房间并广播消息
+            movableObjs[obj.ID] = obj;
+            obj.Room = this;
+
+            Boardcast("AddIn", (buff) =>
+            {
+                buff.Write(obj.ID);
+                buff.Write(obj.Type);
+                buff.Write(obj.Pos.x);
+                buff.Write(obj.Pos.y);
+                buff.Write(obj.Velocity);
+                buff.Write(obj.Dir);
+                buff.Write(obj.Turn2Dir.x);
+                buff.Write(obj.Turn2Dir.y);
+                buff.Write(obj.TurnV);
+            });
+        }
+
+        // 移除指定物体
+        public void RemoveObject(string id)
+        {
+            if (!movableObjs.ContainsKey(id))
+                throw new Exception("object not exists in romm: " + id + " => " + ID);
+
+            var obj = movableObjs[id];
+            movableObjs.Remove(id);
+            obj.Room = null;
+
+            Boardcast("RemoveOut", (buff) => { buff.Write(id); });
         }
 
         // 玩家从房间移除
@@ -66,13 +88,8 @@ namespace Server
         {
             ops.Add(() =>
             {
-                if (!movableObjs.ContainsKey(p.ID))
-                    throw new Exception("player not exists in romm: " + p.ID + " => " + ID);
-
-                movableObjs.Remove(p.ID);
+                RemoveObject(p.ID);
                 p.Room = null;
-
-                Boardcast("RemoveOut", (buff) => { buff.Write(p.ID); });
             });
         }
 
@@ -87,6 +104,9 @@ namespace Server
 
             timeElapsed -= 100;
 
+            // 房间内所有物体移动 100 毫秒
+            ProcessAll(0.1f);
+
             // 处理这一帧的所有指令
             foreach (var op in ops)
                 op();
@@ -96,15 +116,24 @@ namespace Server
             // 广播游戏时间编号推进
             Boardcast("GameTimeFowardStep");
             timeNumber++;
-
-            // 房间内所有物体移动 100 毫秒
-            MoveAll(0.1f);
         }
 
-        void MoveAll(float te)
+        // 处理房间内物件逻辑
+        void ProcessAll(float te)
         {
+            var toBeRemoved = new List<MovableObject>();
             foreach (var obj in movableObjs.Values)
-                obj.MoveForward(te);
+            {
+                obj.OnTimeElapsed(te);
+                if (obj.ToBeRemoved)
+                    toBeRemoved.Add(obj);
+            }
+
+            // 移除该移除的
+            foreach (var obj in toBeRemoved)
+                RemoveObject(obj.ID);
+
+            toBeRemoved.Clear();
         }
 
         // 当前帧需要执行的指令
@@ -150,14 +179,22 @@ namespace Server
                 var turnV = data.ReadFloat();
                 ops.Add(() =>
                 {
-                    if (!movableObjs.ContainsKey(id))
-                        throw new Exception("player not exists in romm: " + id + " => " + ID);
-
                     var a = movableObjs[id];
                     a.Turn2Dir = dirTo;
                     a.TurnV = turnV;
 
                     Boardcast("Turn2", (buff) => { buff.Write(id); buff.Write(dirTo.x); buff.Write(dirTo.y); buff.Write(turnV); });
+                });
+            });
+
+            OnOp("UseSkill", (Session s, IReadableBuffer data) =>
+            {
+                var id = s.ID;
+                var skillName = data.ReadString();
+                ops.Add(() =>
+                {
+                    var a = movableObjs[id] as Airplane;
+                    a.UseSkill(skillName);
                 });
             });
         }

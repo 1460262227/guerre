@@ -29,4 +29,10 @@ public class ControlHandler : MonoBehaviour
 
         APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write(5f); });
     }
+
+    // 使用技能
+    public void OnUseSkill(string skillName)
+    {
+        APIs.Send("GameRoom/test", "UseSkill", (buff) => { buff.Write(skillName); });
+    }
 }

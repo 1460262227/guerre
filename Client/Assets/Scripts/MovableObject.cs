@@ -10,6 +10,9 @@ using Swift.Math;
 // 可移动的物体
 public class MovableObject : MonoBehaviour
 {
+    // 唯一 ID
+    public string ID { get; set; }
+
     // 移动速率
     public float Velocity { get; set; }
 
@@ -82,5 +85,7 @@ public class MovableObject : MonoBehaviour
         var dx = Mathf.Cos(Dir) * d;
         var dy = Mathf.Sin(Dir) * d;
         Pos += new Vec2(dx, dy);
+
+        Debug.Log("pos = " + Pos.x + ", " + Pos.y);
     }
 }

@@ -14,6 +14,11 @@ namespace Server
     /// </summary>
     public abstract class MovableObject
     {
+        public MovableObject()
+        {
+            Init();
+        }
+
         // 唯一 ID
         public string ID;
 
@@ -35,6 +40,8 @@ namespace Server
         // 转向目标方向
         public Vec2 Turn2Dir { get; set; }
 
+        // 可以移除了
+        public bool ToBeRemoved { get; set; }
 
         // 当前方向的 Vector2 表达
         public Vec2 DirV2
@@ -50,8 +57,13 @@ namespace Server
             }
         }
 
+        public virtual void OnTimeElapsed(float te)
+        {
+            MoveForward(te);
+        }
+
         // 沿当前方向移动一段距离
-        public void MoveForward(float te)
+        public virtual float MoveForward(float te)
         {
             // 更新角度
             if (TurnV != 0)
@@ -63,16 +75,25 @@ namespace Server
             var d = te * Velocity;
             var dx = (float)Math.Cos(Dir) * d;
             var dy = (float)Math.Sin(Dir) * d;
-            Pos += new Vec2(dx, dy);
+            var dv = new Vec2(dx, dy);
+            Pos += dv;
+
+            Console.WriteLine("pos = " + Pos.x + ", " + Pos.y);
+
+            return dv.Length;
         }
 
-        public void Init()
+        public virtual void Init()
         {
             Pos = Vec2.Zero;
             Dir = MathEx.HalfPi;
             Velocity = 1;
             Turn2Dir = Vec2.Zero;
             TurnV = 0;
+            ToBeRemoved = false;
+            Room = null;
         }
+
+        public GameRoom Room { get; set; }
     }
 }

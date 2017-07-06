@@ -75,6 +75,7 @@
     <Compile Include="Common\Swift\Net\MessageHandler.cs" />
     <Compile Include="Login\LoginManager.cs" />
     <Compile Include="Log\ServerLogger.cs" />
+    <Compile Include="RoomService\Bullet.cs" />
     <Compile Include="RoomService\GRApis.cs" />
     <Compile Include="RoomService\MovableObject.cs" />
     <Compile Include="ServerMessageHandlers.cs" />

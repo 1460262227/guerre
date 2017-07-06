@@ -13,7 +13,10 @@ public class GameWorld : MonoBehaviour {
     public Transform SceneRoot = null;
 
     // 飞机模型
-    public Airplane[] AirplaneModels = null;
+    public GameObject[] AirplaneModels = null;
+
+    // 子弹模型
+    public GameObject[] BulletModels = null;
 
     // 当前世界移动物体
     Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
@@ -26,19 +29,27 @@ public class GameWorld : MonoBehaviour {
         OnTimeElapsed(Time.deltaTime);
     }
 
-    // 添加一架飞机
-    public void AddAirplane(string id, Vec2 pos, float velocity, float dir, Vec2 dirTo, float turnV)
+    // 添加一个物体
+    public void AddObject(string id, string type, Vec2 pos, float velocity, float dir, Vec2 dirTo, float turnV)
     {
         if (movingObjs.ContainsKey(id))
-            throw new Exception("airplane id conflicted: " + id);
+            throw new Exception("object id conflicted: " + id);
 
         // 添加模型
-        var go = Instantiate(AirplaneModels[0].gameObject) as GameObject;
+        GameObject go = null;
+
+        if (type == "Airplane")
+            go = Instantiate(AirplaneModels[0].gameObject) as GameObject;
+        else if (type == "Bullet")
+            go = Instantiate(BulletModels[0].gameObject) as GameObject;
+        else
+            return;
+
         go.SetActive(true);
         go.transform.SetParent(SceneRoot, false);
 
-        // 设置飞机属性
-        var a = go.GetComponent<Airplane>();
+        // 设置属性
+        var a = go.GetComponent<MovableObject>();
         a.ID = id;
         a.Pos = pos;
         a.Dir = dir;
@@ -92,7 +103,7 @@ public class GameWorld : MonoBehaviour {
         {
             if (ProcessCommands())
             {
-                timeElapsed -= 100;
+                timeElapsed = timeElapsed % 100;
                 curCmdIndex++;
 
                 // 延迟了就加速追
@@ -127,18 +138,17 @@ public class GameWorld : MonoBehaviour {
         throw new Exception("invalid command time number for command list = " + commanders.Count + " and retrieve: " + t);
     }
 
-    // 获取制定 ID 的飞机
-    public Airplane GetByID(string id)
+    // 获取制定 ID 的物体
+    public MovableObject GetByID(string id)
     {
-        return movingObjs[id] as Airplane;
+        return movingObjs[id] as MovableObject;
     }
 
     // 增加飞机
     public void Add(int t, string id, string type, Vec2 pos, float velocity, float dir, Vec2 dirTo, float tv)
     {
         var cmds = RetrieveCmds(t);
-        if (type == "Airplane")
-         cmds.Add(() => { AddAirplane(id, pos, velocity, dir, dirTo, tv); });
+        cmds.Add(() => { AddObject(id, type, pos, velocity, dir, dirTo, tv); });
     }
 
     // 移除飞机
