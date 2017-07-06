@@ -35,31 +35,38 @@ namespace Server
         // 添加玩家到房间
         public void AddPlayer(Player p)
         {
-            if (airplanes.ContainsKey(p.ID))
-                throw new Exception("player already exists in romm: " + p.ID + " => " + ID);
+            ops.Add(() =>
+            {
+                if (airplanes.ContainsKey(p.ID))
+                    throw new Exception("player already exists in romm: " + p.ID + " => " + ID);
 
-            if (p.Room != null)
-                p.Room.RemovePlayer(p);
+                if (p.Room != null)
+                    p.Room.RemovePlayer(p);
 
-            p.Room = this;
+                p.Room = this;
+                var a = new Airplane();
+                InitAirplane(a);
+                airplanes[p.ID] = a;
+                
+                Boardcast("AddIn", (buff) => { buff.Write(p.ID); });
+            });
 
-            var a = new Airplane();
-            InitAirplane(a);
-            airplanes[p.ID] = a;
-
-            Boardcast("AddIn", (buff) => { buff.Write(p.ID); });
+            SyncRoomStatus(p.ID);
         }
 
         // 玩家从房间移除
         public void RemovePlayer(Player p)
         {
-            if (!airplanes.ContainsKey(p.ID))
-                throw new Exception("player not exists in romm: " + p.ID + " => " + ID);
+            ops.Add(() =>
+            {
+                if (!airplanes.ContainsKey(p.ID))
+                    throw new Exception("player not exists in romm: " + p.ID + " => " + ID);
 
-            airplanes.Remove(p.ID);
-            p.Room = null;
+                airplanes.Remove(p.ID);
+                p.Room = null;
 
-            Boardcast("RemoveOut", (buff) => { buff.Write(p.ID); });
+                Boardcast("RemoveOut", (buff) => { buff.Write(p.ID); });
+            });
         }
 
         // 游戏时间流逝
@@ -71,16 +78,33 @@ namespace Server
             if (timeElapsed < 100)
                 return;
 
+            timeElapsed -= 100;
+
+            // 处理这一帧的所有指令
+            foreach (var op in ops)
+                op();
+
+            ops.Clear();
+
             // 广播游戏时间编号推进
-            timeNumber++;
             Boardcast("GameTimeFowardStep");
+            timeNumber++;
+        }
+
+        // 当前帧需要执行的指令
+        List<Action> ops = new List<Action>();
+
+        // 同步房间状态
+        void SyncRoomStatus(string idTo)
+        {
+            GRApis.SendMessage(idTo, "SyncRoom", (buff) => { buff.Write(timeNumber); });
         }
 
         // 房间内广播消息
         void Boardcast(string op, Action<IWriteableBuffer> fun = null)
         {
             foreach (var id in airplanes.Keys)
-                GRApis.SendMessage(id, op, fun);
+                GRApis.SendMessage(id, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );
         }
     }
 }

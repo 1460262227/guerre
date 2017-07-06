@@ -21,11 +21,11 @@ public class GameCore : Core
     {
         // 网络核心
         var nc = new NetCore();
-        core.Add("NetCore", nc);
+        Add("NetCore", nc);
 
         // 消息处理模块
         var mm = new MessageHandler();
-        core.Add("MessageHandler", mm);
+        Add("MessageHandler", mm);
         APIs.SendImpl = mm.Send;
         APIs.RequestImpl = mm.Request;
     }
@@ -33,7 +33,7 @@ public class GameCore : Core
     // 连接服务器
     public void ConnectServer(string ip, int port, System.Action<Connection, string> callback)
     {
-        NetCore nc = core.Get<NetCore>();
+        NetCore nc = Get<NetCore>();
         nc.Close();
 
         UnityEngine.Debug.Log("ConnectServer " + ip + ":" + port);
@@ -48,7 +48,7 @@ public class GameCore : Core
     // 关闭网络连接
     public void CloseNetConnections()
     {
-        NetCore nc = core.Get<NetCore>();
+        NetCore nc = Get<NetCore>();
         nc.Close();
     }
 
@@ -58,12 +58,6 @@ public class GameCore : Core
 
     public void OnTimeElapsed(int te)
     {
-        core.RunOneFrame(te);
+        RunOneFrame(te);
     }
-
-    #region 保护部分
-
-    Core core = new Core();
-
-    #endregion
 }

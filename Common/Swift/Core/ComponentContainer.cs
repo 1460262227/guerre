@@ -19,7 +19,7 @@ namespace Swift
         // 获取给定类型的组件
         public T Get<T>() where T : class
         {
-            Component[] arr = All;
+             Component[] arr = All;
             for (int i = 0; i < arr.Length; i++)
             {
                 Component c = arr[i];

@@ -37,15 +37,15 @@ namespace Server
                 "guerre", "localhost", "root", "123456", "players",
                 "CREATE TABLE players(ID VARCHAR(100) BINARY, Data MediumBlob, PRIMARY KEY(ID ASC));",
                 null, null);
-            srv.Add("PlayerPersistence", null);
+            srv.Add("PlayerPersistence", p);
             var pc = new PlayerContainer(p);
             srv.Add("PlayerContainer", pc);
 
-            // 房间管理
-            BuildGameRoomModule(srv, sc);
-
             // 登录管理
             BuildLoginModule(srv, sc, pc);
+
+            // 房间管理
+            BuildGameRoomModule(srv, sc);
 
             // 所有初始化完成后，启动服务器的网络监听
             log.Info("server started at port: " + port);
@@ -95,6 +95,16 @@ namespace Server
             grMgr.GRC = grc;
             srv.Add("GameRoomMgr", grMgr);
 
+            // add a test room
+            var tgr = grMgr.CreateNewRoom("test");
+
+            var lgMgr = srv.Get<LoginManager>();
+            lgMgr.OnPlayerLogin += (p) => { tgr.AddPlayer(p); };
+            lgMgr.OnPlayerLogout += (p) => { tgr.RemovePlayer(p); };
+
+            // apis
+            GRApis.SendMessageImpl = (id, op, fun) => { SendTo(sc, id, op, fun); };
+
             GRApis.SC = sc;
         }
 
@@ -105,6 +115,16 @@ namespace Server
             lgMgr.SC = sc;
             lgMgr.PC = pc;
             srv.Add("LoginMgr", lgMgr);
+
+            var nc = srv.Get<NetCore>();
+            nc.OnDisconnected += (conn, r) =>
+            {
+                var s = sc.GetByConnection(conn);
+                if (s == null)
+                    return;
+
+                lgMgr.OnLogout(s, r);
+            };
         }
     }
 }

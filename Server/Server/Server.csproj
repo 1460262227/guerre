@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Airplane.cs" />
+    <Compile Include="Common\Ext.cs" />
     <Compile Include="Common\Player\PlayerInfo.cs" />
     <Compile Include="Common\Swift\BufferExtension.cs" />
     <Compile Include="Common\Swift\ISerializable.cs" />

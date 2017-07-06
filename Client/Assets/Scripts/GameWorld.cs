@@ -9,8 +9,6 @@ using Swift.Math;
 // 一个游戏世界代表一局游戏
 public class GameWorld : MonoBehaviour {
 
-    public Rect WorldRect = new Rect(-1, -1, 2, 2);
-
     // 场景根节点
     public Transform SceneRoot = null;
 
@@ -62,6 +60,7 @@ public class GameWorld : MonoBehaviour {
     List<List<Action>> commanders = new List<List<Action>>();
 
     // 当前指令位置
+    int timeNumBase = 0; // 上一次同步房间状态时的时间编号，客户端只能收到此后的消息
     int curCmdIndex = 0;
     int timeTime = 1; // 加速播放的倍数
 
@@ -102,32 +101,7 @@ public class GameWorld : MonoBehaviour {
 
         // 推动飞机运动
         foreach (var mo in movingObjs.Values)
-        {
             mo.MoveForward(te);
-
-            // 碰到四边自动折返
-            var dv = mo.DirV2;
-            if (mo.Pos.x < WorldRect.xMin)
-            {
-                mo.Pos = new Vec2(WorldRect.xMin * 2 - mo.Pos.x, mo.Pos.y);
-                mo.DirV2 = new Vec2(-dv.x, dv.y);
-            }
-            else if (mo.Pos.x > WorldRect.xMax)
-            {
-                mo.Pos = new Vec2(WorldRect.xMax * 2 - mo.Pos.x, mo.Pos.y);
-                mo.DirV2 = new Vec2(-dv.x, dv.y);
-            }
-            else if (mo.Pos.y < WorldRect.yMin)
-            {
-                mo.Pos = new Vec2(mo.Pos.x, WorldRect.yMin * 2 - mo.Pos.y);
-                mo.DirV2 = new Vec2(dv.x, -dv.y);
-            }
-            else if (mo.Pos.y > WorldRect.yMax)
-            {
-                mo.Pos = new Vec2(mo.Pos.x, WorldRect.yMax * 2 - mo.Pos.y);
-                mo.DirV2 = new Vec2(dv.x, -dv.y);
-            }
-        }
     }
 
     #region 所有可接收的指令接口，需要指明指令编号，共用编号的一组指令认为是同时发生
@@ -173,6 +147,13 @@ public class GameWorld : MonoBehaviour {
         FC.For(t, t + tLen, (i) => { RetrieveCmds(i).Add(null); });
     }
 
+    // 同步房间状态
+    public void SyncRoomStatus(int t)
+    {
+        timeNumBase = t;
+        commanders.Clear();
+    }
+
     // 设置飞机转向指定方向
     public void Turn2(int t, string id, Vec2 toDir, float tv)
     {
@@ -186,4 +167,23 @@ public class GameWorld : MonoBehaviour {
     }
 
     #endregion
+
+    void OnOp(string op, Action<int, IReadableBuffer> cb)
+    {
+        var mh = GameCore.Instance.Get<MessageHandler>();
+        mh.OnOp("GameRoom/" + op, (conn, data) =>
+        {
+            var t = data.ReadInt() - timeNumBase;
+            cb(t, data);
+        });
+    }
+
+    public void OnGameCoreInitialized()
+    {
+        var mh = GameCore.Instance.Get<MessageHandler>();
+        mh.OnOp("GameRoom/SyncRoom", (conn, data) => { var t = data.ReadInt(); SyncRoomStatus(t); });
+        OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
+        OnOp("AddIn", (t, data) => { var pid = data.ReadString(); Add(t, pid, 0, Vec2.Zero, MathEx.Up, 1); });
+        OnOp("RemoveOut", (t, data) => { var pid = data.ReadString(); Del(t, pid); });
+    }
 }

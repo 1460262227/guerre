@@ -14,7 +14,11 @@ namespace Server
     public class Player : UniqueDataItem
     {
         // 玩家信息
-        public PlayerInfo PlayerInfo;
+        public PlayerInfo PlayerInfo
+        {
+            get { return playerInfo; }
+            set { playerInfo = value; ID = playerInfo.ID; }
+        } PlayerInfo playerInfo;
 
         // 所在房间
         public GameRoom Room { get; set; }
@@ -24,7 +28,7 @@ namespace Server
             base.Sync();
             BeginSync();
             {
-                SyncObj(ref PlayerInfo);
+                SyncObj(ref playerInfo);
             }
             EndSync();
         }

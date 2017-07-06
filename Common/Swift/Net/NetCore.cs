@@ -489,7 +489,6 @@ namespace Swift
                             string ex = "no such a component named: " + componentName;
                             nc.Close(ex);
                             throw new Exception(ex);
-                            // break;
                         }
 
                         // 投递消息

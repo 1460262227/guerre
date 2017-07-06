@@ -28,23 +28,30 @@ namespace Server
             var op = data.ReadString();
             var s = SC.GetByConnection(conn);
 
-            if (s != null)
-                HandleOp(s, op, data, buff, end);
-            else
+            if (s == null || !HandleOp(s, op, data, buff, end))
                 HandleOp(conn, op, data, buff, end);
         }
 
-        public virtual void HandleOp(Session s, string op, IReadableBuffer data, IWriteableBuffer buff, Action end)
+        public virtual bool HandleOp(Session s, string op, IReadableBuffer data, IWriteableBuffer buff, Action end)
         {
             if (messageHandlersOnSesson.ContainsKey(op))
+            {
                 messageHandlersOnSesson[op](s, data);
+                return true;
+            }
             else if (requestHandlersOnSesson.ContainsKey(op))
             {
                 requestHandlersOnSesson[op](s, data, buff);
                 end();
+                return true;
             }
             else if (requestHandlersOnConnAsync.ContainsKey(op))
+            {
                 requestHandlersOnSessionAsync[op](s, data, buff, end);
+                return true;
+            }
+
+            return false;
         }
 
         // 注册消息处理方法

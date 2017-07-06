@@ -80,7 +80,11 @@ namespace Swift
             ProcessMessage(conn, data, buff, () =>
             {
                 if (buff.Available > 0)
-                    CreateResponser(conn).BeginResponse().Write(buff.Data);
+                {
+                    var rbuff = CreateResponser(conn).BeginResponse();
+                    rbuff.Write(buff.Data);
+                    conn.End(rbuff);
+                }
             });
         }
 

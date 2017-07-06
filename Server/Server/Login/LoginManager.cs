@@ -15,15 +15,13 @@ namespace Server
     {
         public PlayerContainer PC = null;
 
+        // 玩家登入/登出事件
+        public event Action<Player> OnPlayerLogin = null;
+        public event Action<Player> OnPlayerLogout = null;
+
         public LoginManager()
         {
             OnOp("login", OnLogin);
-            OnOp("login", (Session s, IReadableBuffer data, IWriteableBuffer buff, Action end) =>
-            {
-                var id = data.ReadString();
-                var pwd = data.ReadString();
-                OnLogin(s, id, pwd, (r) => { buff.Write(r); end(); });
-            });
         }
 
         // 玩家登录
@@ -31,6 +29,10 @@ namespace Server
         {
             var id = data.ReadString();
             var pwd = data.ReadString();
+
+            // 重复登录就先登出
+            if (SC.ContainsKey(id))
+                OnLogout(SC[id], "relogin");
 
             var s = new Session(id);
             s.Connection = conn;
@@ -58,10 +60,20 @@ namespace Server
                     s.Player = p;
                     SC[id] = s;
                     r(true);
+
+                    OnPlayerLogin.SC(p);
                 }
                 else
                     r(false);
             });
+        }
+
+        // 玩家登出
+        public void OnLogout(Session s, string reason)
+        {
+            SC.Remove(s.ID);
+            s.Connection.Close();
+            OnPlayerLogout.SC(s.Player);
         }
     }
 }

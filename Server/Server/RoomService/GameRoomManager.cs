@@ -10,7 +10,7 @@ namespace Server
     /// <summary>
     /// 管理游戏房间逻辑
     /// </summary>
-    public class GameRoomManager : Component
+    public class GameRoomManager : Component, IFrameDrived
     {
         public GameRoomContainer GRC = null;
 
@@ -26,10 +26,9 @@ namespace Server
             return gr;
         }
 
-        // 获取指定房间
-        public GameRoom GetRoom(string id)
+        public void OnTimeElapsed(int te)
         {
-            return GRC.ContainsKey(id) ? GRC[id] : null;
+            GRC.OnTimeElapsed(te);
         }
     }
 }
