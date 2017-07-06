@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class LoginUI : UIBase {
 
+    public Text IP;
     public Text Acc;
     public Text Pwd;
     public Text Tips;
@@ -13,7 +14,7 @@ public class LoginUI : UIBase {
     // 执行登录操作
     public void OnLogin()
     {
-        var ip = "127.0.0.1";
+        var ip = IP.text;
         var port = 9600;
         var acc = Acc.text;
         var pwd = Pwd.text;
