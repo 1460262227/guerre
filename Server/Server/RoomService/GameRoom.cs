@@ -14,7 +14,7 @@ namespace Server
     /// </summary>
     public class GameRoom : MessageHandlerComponent
     {
-        Dictionary<string, Airplane> airplanes = new Dictionary<string, Airplane>();
+        Dictionary<string, MovableObject> movableObjs = new Dictionary<string, MovableObject>();
 
         // 房间 ID
         public string ID { get; private set; }
@@ -37,21 +37,23 @@ namespace Server
         {
             ops.Add(() =>
             {
-                if (airplanes.ContainsKey(p.ID))
+                if (movableObjs.ContainsKey(p.ID))
                     throw new Exception("player already exists in romm: " + p.ID + " => " + ID);
 
                 if (p.Room != null)
                     p.Room.RemovePlayer(p);
 
-                p.Room = this;
+                // 先同步房间信息
+                SyncRoomStatus(p.ID);
+
+                // 加入房间并广播消息
                 var a = new Airplane();
                 InitAirplane(a);
-                airplanes[p.ID] = a;
-                
-                Boardcast("AddIn", (buff) => { buff.Write(p.ID); });
-            });
+                movableObjs[p.ID] = a;
+                p.Room = this;
 
-            SyncRoomStatus(p.ID);
+                Boardcast("AddIn", (buff) => { buff.Write(p.ID); buff.Write(a.Type); });
+            });
         }
 
         // 玩家从房间移除
@@ -59,10 +61,10 @@ namespace Server
         {
             ops.Add(() =>
             {
-                if (!airplanes.ContainsKey(p.ID))
+                if (!movableObjs.ContainsKey(p.ID))
                     throw new Exception("player not exists in romm: " + p.ID + " => " + ID);
 
-                airplanes.Remove(p.ID);
+                movableObjs.Remove(p.ID);
                 p.Room = null;
 
                 Boardcast("RemoveOut", (buff) => { buff.Write(p.ID); });
@@ -89,6 +91,15 @@ namespace Server
             // 广播游戏时间编号推进
             Boardcast("GameTimeFowardStep");
             timeNumber++;
+
+            // 房间内所有物体移动 100 毫秒
+            MoveAll(0.1f);
+        }
+
+        void MoveAll(float te)
+        {
+            foreach (var obj in movableObjs.Values)
+                obj.MoveForward(te);
         }
 
         // 当前帧需要执行的指令
@@ -97,13 +108,26 @@ namespace Server
         // 同步房间状态
         void SyncRoomStatus(string idTo)
         {
-            GRApis.SendMessage(idTo, "SyncRoom", (buff) => { buff.Write(timeNumber); });
+            GRApis.SendMessage(idTo, "SyncRoom", (buff) =>
+            {
+                buff.Write(timeNumber);
+                buff.Write(movableObjs.Count);
+                foreach (var id in movableObjs.Keys)
+                {
+                    var a = movableObjs[id];
+                    buff.Write(id);
+                    buff.Write(a.Type);
+                    buff.Write(a.Pos.x);
+                    buff.Write(a.Pos.y);
+                    buff.Write(a.Dir);
+                }
+            });
         }
 
         // 房间内广播消息
         void Boardcast(string op, Action<IWriteableBuffer> fun = null)
         {
-            foreach (var id in airplanes.Keys)
+            foreach (var id in movableObjs.Keys)
                 GRApis.SendMessage(id, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );
         }
     }

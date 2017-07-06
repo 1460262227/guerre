@@ -27,21 +27,18 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 添加一架飞机
-    public void AddAirplane(string id, int type, Vec2 pos, float dir, float velocity)
+    public void AddAirplane(string id, Vec2 pos, float dir, float velocity)
     {
         if (movingObjs.ContainsKey(id))
             throw new Exception("airplane id conflicted: " + id);
 
-        if (type < 0 || type >= AirplaneModels.Length)
-            throw new Exception("no such airplane type: " + type);
-
         // 添加模型
-        var pGo = Instantiate(AirplaneModels[type].gameObject) as GameObject;
-        pGo.SetActive(true);
-        pGo.transform.SetParent(SceneRoot, false);
+        var go = Instantiate(AirplaneModels[0].gameObject) as GameObject;
+        go.SetActive(true);
+        go.transform.SetParent(SceneRoot, false);
 
         // 设置飞机属性
-        var a = pGo.GetComponent<Airplane>();
+        var a = go.GetComponent<Airplane>();
         a.ID = id;
         a.Pos = pos;
         a.Dir = dir;
@@ -54,6 +51,13 @@ public class GameWorld : MonoBehaviour {
     {
         if (!movingObjs.ContainsKey(id))
             throw new Exception("airplane id not exists: " + id);
+
+        var a = movingObjs[id];
+        movingObjs.Remove(id);
+
+        var go = a.gameObject;
+        go.transform.SetParent(null);
+        Destroy(go);
     }
 
     // 等待执行的指令列表
@@ -128,10 +132,11 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 增加飞机
-    public void Add(int t, string id, int type, Vec2 pos, float dir, float velocity)
+    public void Add(int t, string id, string type, Vec2 pos, float dir, float velocity)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { AddAirplane(id, type, pos, dir, velocity); });
+        if (type == "Airplane")
+         cmds.Add(() => { AddAirplane(id, pos, dir, velocity); });
     }
 
     // 移除飞机
@@ -148,10 +153,19 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 同步房间状态
-    public void SyncRoomStatus(int t)
+    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, float[] dirs)
     {
         timeNumBase = t;
         commanders.Clear();
+
+        FC.For(ids.Length, (i) =>
+        {
+            var id = ids[i];
+            var type = types[i];
+            var pos = poses[i];
+            var dir = dirs[i];
+            Add(0, id, type, pos, dir, 1);
+        });
     }
 
     // 设置飞机转向指定方向
@@ -181,9 +195,28 @@ public class GameWorld : MonoBehaviour {
     public void OnGameCoreInitialized()
     {
         var mh = GameCore.Instance.Get<MessageHandler>();
-        mh.OnOp("GameRoom/SyncRoom", (conn, data) => { var t = data.ReadInt(); SyncRoomStatus(t); });
+        mh.OnOp("GameRoom/SyncRoom", (conn, data) =>
+        {
+            var t = data.ReadInt();
+
+            var cnt = data.ReadInt();
+            var ids = new string[cnt];
+            var types = new string[cnt];
+            var poses = new Vec2[cnt];
+            var dirs = new float[cnt];
+            FC.For(cnt, (i) =>
+            {
+                ids[i] = data.ReadString();
+                types[i] = data.ReadString();
+                poses[i] = new Vec2(data.ReadFloat(), data.ReadFloat());
+                dirs[i] = data.ReadFloat();
+            });
+
+            SyncRoomStatus(t, ids, types, poses, dirs);
+        });
+
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
-        OnOp("AddIn", (t, data) => { var pid = data.ReadString(); Add(t, pid, 0, Vec2.Zero, MathEx.Up, 1); });
+        OnOp("AddIn", (t, data) => { var pid = data.ReadString(); var type = data.ReadString(); Add(t, pid, type, Vec2.Zero, MathEx.Up, 1); });
         OnOp("RemoveOut", (t, data) => { var pid = data.ReadString(); Del(t, pid); });
     }
 }

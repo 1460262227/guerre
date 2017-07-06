@@ -1,17 +1,24 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using Guerre;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Swift;
 using Swift.Math;
+using Guerre;
 
 namespace Server
 {
-    // 一架飞机
-    public class Airplane
+    /// <summary>
+    /// 房间内的可移动物体
+    /// </summary>
+    public abstract class MovableObject
     {
         // 唯一 ID
         public string ID;
+
+        // 物体类型
+        public abstract string Type { get; }
 
         // 移动速率
         public float Velocity { get; set; }

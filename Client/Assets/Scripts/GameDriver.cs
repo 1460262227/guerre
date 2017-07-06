@@ -15,6 +15,7 @@ public class GameDriver : MonoBehaviour
         // 初始化游戏核心
         GameCore.Instance.Init();
         BroadcastMessage("OnGameCoreInitialized");
+        Application.runInBackground = true;
     }
 
     void FixedUpdate()
