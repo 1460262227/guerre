@@ -93,8 +93,8 @@ public class GameWorld : MonoBehaviour {
                 timeElapsed -= 100;
                 curCmdIndex++;
 
-                // 延迟超过 1 秒了，加速播放
-                timeTime = (commanders.Count - curCmdIndex >= 10) ? 10 : 1;
+                // 延迟了就加速追
+                timeTime = commanders.Count - curCmdIndex + 1;
             }
             else
                 return;

@@ -25,7 +25,7 @@ namespace Swift.Math
             var x = v.x / len;
             var y = v.y / len;
 
-            if (System.Math.Abs(x) <= float.Epsilon)
+            if (v.Length <= float.Epsilon)
                 return y > 0 ? HalfPi : -HalfPi;
             else
             {
@@ -54,22 +54,22 @@ namespace Swift.Math
         }
 
         // 计算转向，从当前朝向转向目标方向，并限制最大转动角度
-        public static float CalcDir4Turn2(Vec2 nowLookAt, Vec2 turn2LookAt, float max)
+        public static float CalcDir4Turn2(Vec2 nowDir, Vec2 turn2Dir, float max)
         {
-            var dv = nowLookAt;
-            var da = max;
-            var q = Quat.FromToRotation(new Vec3(dv.x, dv.y, 0), new Vec3(turn2LookAt.x, turn2LookAt.y, 0));
-            // var qq = UnityEngine.Quaternion.FromToRotation(new UnityEngine.Vector3(dv.x, dv.y, 0), new UnityEngine.Vector3(turn2LookAt.x, turn2LookAt.y, 0));
+            max = max > 0 ? max : -max;
+            var dirFrom = nowDir.Dir();
+            var dirTo = turn2Dir.Dir();
+            var tv = dirTo - dirFrom;
 
-            var tv = q.eulerAngles.z * MathEx.Deg2Rad;
             if (tv > MathEx.Pi)
-            {
-                tv -= MathEx.Pi;
-                da = -da;
-            }
+                tv -= MathEx.Pi2;
+            else if (tv < -MathEx.Pi)
+                tv += MathEx.Pi2;
 
-            da = (float)System.Math.Abs(da) < (float)System.Math.Abs(tv) ? da : tv;
-            return da;
+            if ((float)System.Math.Abs(max) < (float)System.Math.Abs(tv))
+                return tv > 0 ? max : -max;
+            else
+                return tv;
         }
     }
 }

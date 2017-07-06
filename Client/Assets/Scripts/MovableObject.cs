@@ -38,13 +38,14 @@ public class MovableObject : MonoBehaviour
     {
         get
         {
-            return transform.localRotation.eulerAngles.z * Mathf.PI / 180;
+            return dir;
         }
         set
         {
-            transform.localRotation = Quaternion.Euler(0, 0, 180 * value / Mathf.PI);
+            dir = value;
+            transform.localRotation = Quaternion.Euler(0, 0, value * MathEx.Rad2Deg);
         }
-    }
+    } float dir = 0;
 
     // 当前方向的 Vector2 表达
     public Vec2 DirV2
@@ -68,7 +69,7 @@ public class MovableObject : MonoBehaviour
         // 更新角度
         if (TurnV != 0)
         {
-            var da = MathEx.CalcDir4Turn2(DirV2, Vec2.Right, 1);
+            var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, te * TurnV);
             Dir += da;
         }
 

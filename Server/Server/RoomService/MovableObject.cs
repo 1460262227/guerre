@@ -56,7 +56,7 @@ namespace Server
             // 更新角度
             if (TurnV != 0)
             {
-                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, TurnV);
+                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, TurnV * te);
                 Dir += da;
             }
 

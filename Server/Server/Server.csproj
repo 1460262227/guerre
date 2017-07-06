@@ -48,8 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Swift\Math\Mat4x4.cs" />
-    <Compile Include="Common\Swift\Math\Quat.cs" />
     <Compile Include="Common\Swift\Math\Vec3.cs" />
     <Compile Include="RoomService\Airplane.cs" />
     <Compile Include="Common\Ext.cs" />
