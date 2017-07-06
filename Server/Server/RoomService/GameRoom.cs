@@ -26,14 +26,6 @@ namespace Server
             RegisterAllMessages();
         }
 
-        // 初始化刚进入房间的玩家的飞机信息
-        void InitAirplane(Airplane a)
-        {
-            a.Pos = Vec2.Zero;
-            a.Dir = MathEx.HalfPi;
-            a.Velocity = 1;
-        }
-
         // 添加玩家到房间
         public void AddPlayer(Player p)
         {
@@ -50,11 +42,22 @@ namespace Server
 
                 // 加入房间并广播消息
                 var a = new Airplane();
-                InitAirplane(a);
+                a.Init();
                 movableObjs[p.ID] = a;
                 p.Room = this;
 
-                Boardcast("AddIn", (buff) => { buff.Write(p.ID); buff.Write(a.Type); });
+                Boardcast("AddIn", (buff) => 
+                {
+                    buff.Write(p.ID);
+                    buff.Write(a.Type);
+                    buff.Write(a.Pos.x);
+                    buff.Write(a.Pos.y);
+                    buff.Write(a.Velocity);
+                    buff.Write(a.Dir);
+                    buff.Write(a.Turn2Dir.x);
+                    buff.Write(a.Turn2Dir.y);
+                    buff.Write(a.TurnV);
+                });
             });
         }
 
@@ -121,7 +124,11 @@ namespace Server
                     buff.Write(a.Type);
                     buff.Write(a.Pos.x);
                     buff.Write(a.Pos.y);
+                    buff.Write(a.Velocity);
                     buff.Write(a.Dir);
+                    buff.Write(a.Turn2Dir.x);
+                    buff.Write(a.Turn2Dir.y);
+                    buff.Write(a.TurnV);
                 }
             });
         }

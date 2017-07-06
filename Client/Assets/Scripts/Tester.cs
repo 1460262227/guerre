@@ -12,7 +12,7 @@ public class Tester : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        GW.Add(0, "me", "Aireplane", Vec2.Zero, MathEx.Up, 1f);
+        GW.Add(0, "me", "Aireplane", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 0);
         StartCoroutine(PushTime(1));
     }
 

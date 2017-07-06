@@ -65,5 +65,14 @@ namespace Server
             var dy = (float)Math.Sin(Dir) * d;
             Pos += new Vec2(dx, dy);
         }
+
+        public void Init()
+        {
+            Pos = Vec2.Zero;
+            Dir = MathEx.HalfPi;
+            Velocity = 1;
+            Turn2Dir = Vec2.Zero;
+            TurnV = 0;
+        }
     }
 }

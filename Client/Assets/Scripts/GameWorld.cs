@@ -27,7 +27,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 添加一架飞机
-    public void AddAirplane(string id, Vec2 pos, float dir, float velocity)
+    public void AddAirplane(string id, Vec2 pos, float velocity, float dir, Vec2 dirTo, float turnV)
     {
         if (movingObjs.ContainsKey(id))
             throw new Exception("airplane id conflicted: " + id);
@@ -43,6 +43,8 @@ public class GameWorld : MonoBehaviour {
         a.Pos = pos;
         a.Dir = dir;
         a.Velocity = velocity;
+        a.Turn2Dir = dirTo;
+        a.TurnV = turnV;
         movingObjs[id] = a;
     }
 
@@ -132,11 +134,11 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 增加飞机
-    public void Add(int t, string id, string type, Vec2 pos, float dir, float velocity)
+    public void Add(int t, string id, string type, Vec2 pos, float velocity, float dir, Vec2 dirTo, float tv)
     {
         var cmds = RetrieveCmds(t);
         if (type == "Airplane")
-         cmds.Add(() => { AddAirplane(id, pos, dir, velocity); });
+         cmds.Add(() => { AddAirplane(id, pos, velocity, dir, dirTo, tv); });
     }
 
     // 移除飞机
@@ -153,7 +155,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 同步房间状态
-    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, float[] dirs)
+    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, float[] vs, float[] dirs, Vec2[] dirTos, float[] turnVs)
     {
         timeNumBase = t;
         commanders.Clear();
@@ -164,7 +166,10 @@ public class GameWorld : MonoBehaviour {
             var type = types[i];
             var pos = poses[i];
             var dir = dirs[i];
-            Add(0, id, type, pos, dir, 1);
+            var v = vs[i];
+            var dirTo = dirTos[i];
+            var tv = turnVs[i];
+            Add(0, id, type, pos, dir, v, dirTo, tv);
         });
     }
 
@@ -210,21 +215,38 @@ public class GameWorld : MonoBehaviour {
             var ids = new string[cnt];
             var types = new string[cnt];
             var poses = new Vec2[cnt];
+            var vs = new float[cnt];
             var dirs = new float[cnt];
+            var dirTos = new Vec2[cnt];
+            var turnVs = new float[cnt];
             FC.For(cnt, (i) =>
             {
                 ids[i] = data.ReadString();
                 types[i] = data.ReadString();
                 poses[i] = new Vec2(data.ReadFloat(), data.ReadFloat());
+                vs[i] = data.ReadFloat();
                 dirs[i] = data.ReadFloat();
+                dirTos[i] = new Vec2(data.ReadFloat(), data.ReadFloat());
+                turnVs[i] = data.ReadFloat();
             });
 
-            SyncRoomStatus(t, ids, types, poses, dirs);
+            SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, turnVs);
         });
 
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
-        OnOp("AddIn", (t, data) => { var id = data.ReadString(); var type = data.ReadString(); Add(t, id, type, Vec2.Zero, MathEx.Up, 1); });
-        OnOp("RemoveOut", (t, data) => { var id = data.ReadString(); Del(t, id); });
+        OnOp("AddIn", (t, data) =>
+        {
+            var id = data.ReadString();
+            var type = data.ReadString();
+            var pos = new Vec2(data.ReadFloat(), data.ReadFloat());
+            var v = data.ReadFloat();
+            var dir = data.ReadFloat();
+            var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
+            var tv = data.ReadFloat();
+
+            Add(t, id, type, pos, v, dir, dirTo, tv);
+        });
+        OnOp("RemoveOut", (t, data) => { var id = data.ReadString(); Del(t, id);});
         OnOp("Turn2", (t, data) =>
         {
             var id = data.ReadString();
