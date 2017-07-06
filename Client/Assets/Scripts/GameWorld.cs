@@ -168,6 +168,13 @@ public class GameWorld : MonoBehaviour {
         });
     }
 
+    // 设置飞机方向
+    public void SetDir(int t, string id, float dir)
+    {
+        var cmds = RetrieveCmds(t);
+        cmds.Add(() => { var mo = movingObjs[id]; mo.Dir = dir; });
+    }
+
     // 设置飞机转向指定方向
     public void Turn2(int t, string id, Vec2 toDir, float tv)
     {
@@ -216,7 +223,14 @@ public class GameWorld : MonoBehaviour {
         });
 
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
-        OnOp("AddIn", (t, data) => { var pid = data.ReadString(); var type = data.ReadString(); Add(t, pid, type, Vec2.Zero, MathEx.Up, 1); });
-        OnOp("RemoveOut", (t, data) => { var pid = data.ReadString(); Del(t, pid); });
+        OnOp("AddIn", (t, data) => { var id = data.ReadString(); var type = data.ReadString(); Add(t, id, type, Vec2.Zero, MathEx.Up, 1); });
+        OnOp("RemoveOut", (t, data) => { var id = data.ReadString(); Del(t, id); });
+        OnOp("Turn2", (t, data) =>
+        {
+            var id = data.ReadString();
+            var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
+            var tv = data.ReadFloat();
+            Turn2(t, id, dirTo, tv);
+        });
     }
 }

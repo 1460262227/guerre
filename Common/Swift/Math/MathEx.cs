@@ -14,6 +14,9 @@ namespace Swift.Math
         public const float Up = HalfPi;
         public const float Down = HalfPi + Pi;
 
+        public const float Rad2Deg = 180 / Pi;
+        public const float Deg2Rad = Pi / 180;
+
         // 向量所指方向对应的欧拉角(0-2pi)
         public static float Dir(this Vec2 v)
         {
@@ -48,6 +51,25 @@ namespace Swift.Math
                 return max;
             else
                 return v;
+        }
+
+        // 计算转向，从当前朝向转向目标方向，并限制最大转动角度
+        public static float CalcDir4Turn2(Vec2 nowLookAt, Vec2 turn2LookAt, float max)
+        {
+            var dv = nowLookAt;
+            var da = max;
+            var q = Quat.FromToRotation(new Vec3(dv.x, dv.y, 0), new Vec3(turn2LookAt.x, turn2LookAt.y, 0));
+            // var qq = UnityEngine.Quaternion.FromToRotation(new UnityEngine.Vector3(dv.x, dv.y, 0), new UnityEngine.Vector3(turn2LookAt.x, turn2LookAt.y, 0));
+
+            var tv = q.eulerAngles.z * MathEx.Deg2Rad;
+            if (tv > MathEx.Pi)
+            {
+                tv -= MathEx.Pi;
+                da = -da;
+            }
+
+            da = (float)System.Math.Abs(da) < (float)System.Math.Abs(tv) ? da : tv;
+            return da;
         }
     }
 }

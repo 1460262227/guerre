@@ -93,6 +93,7 @@ namespace Server
             var grc = new GameRoomContainer();
             var grMgr = new GameRoomManager();
             grMgr.GRC = grc;
+            grMgr.SC = sc;
             srv.Add("GameRoomMgr", grMgr);
 
             // add a test room

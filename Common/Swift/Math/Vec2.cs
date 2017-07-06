@@ -34,6 +34,26 @@ namespace Swift.Math
             return new Vec2(v1.x - v2.x, v1.y - v2.y);
         }
 
+        public static Vec2 operator *(Vec2 v, float scale)
+        {
+            return new Vec2(v.x * scale, v.y * scale);
+        }
+
+        public static Vec2 operator *(float scale, Vec2 v)
+        {
+            return new Vec2(v.x * scale, v.y * scale);
+        }
+
+        public static Vec2 operator /(Vec2 v, float scale)
+        {
+            return new Vec2(v.x / scale, v.y / scale);
+        }
+
+        public static Vec2 operator -(Vec2 v)
+        {
+            return new Vec2(-v.x, -v.y);
+        }
+
         public static bool operator == (Vec2 v1, Vec2 v2)
         {
             return v1.x == v2.x && v1.y == v2.y;

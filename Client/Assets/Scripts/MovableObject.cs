@@ -68,17 +68,7 @@ public class MovableObject : MonoBehaviour
         // 更新角度
         if (TurnV != 0)
         {
-            var dv = DirV2;
-            var da = TurnV * te;
-            var q = Quaternion.FromToRotation(new Vector3(dv.x, dv.y), new Vector3(Turn2Dir.x, Turn2Dir.y));
-            var tv = q.eulerAngles.z * Mathf.PI / 180;
-            if (tv > Mathf.PI)
-            {
-                tv -= Mathf.PI;
-                da = -da;
-            }
-
-            da = Mathf.Abs(da) < Mathf.Abs(tv) ? da : tv;
+            var da = MathEx.CalcDir4Turn2(DirV2, Vec2.Right, 1);
             Dir += da;
         }
 

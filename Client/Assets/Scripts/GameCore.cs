@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Swift;
+using Guerre;
 
 /// <summary>
 /// 客户端游戏核心对象，引用所有逻辑模块并负责主要驱动
@@ -26,8 +27,8 @@ public class GameCore : Core
         // 消息处理模块
         var mm = new MessageHandler();
         Add("MessageHandler", mm);
-        APIs.SendImpl = mm.Send;
-        APIs.RequestImpl = mm.Request;
+        APIs.Send = mm.Send;
+        APIs.Request = mm.Request;
     }
 
     // 连接服务器

@@ -12,7 +12,7 @@ namespace Server
     /// <summary>
     /// 一个游戏房间
     /// </summary>
-    public class GameRoom : MessageHandlerComponent
+    public class GameRoom : ServerMessageHandlerComponent
     {
         Dictionary<string, MovableObject> movableObjs = new Dictionary<string, MovableObject>();
 
@@ -22,6 +22,8 @@ namespace Server
         public GameRoom(string id)
         {
             ID = id;
+
+            RegisterAllMessages();
         }
 
         // 初始化刚进入房间的玩家的飞机信息
@@ -129,6 +131,28 @@ namespace Server
         {
             foreach (var id in movableObjs.Keys)
                 GRApis.SendMessage(id, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );
+        }
+
+        // 注册所有消息处理函数
+        void RegisterAllMessages()
+        {
+            OnOp("Turn2", (Session s, IReadableBuffer data) =>
+            {
+                var id = s.ID;
+                var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
+                var turnV = data.ReadFloat();
+                ops.Add(() =>
+                {
+                    if (!movableObjs.ContainsKey(id))
+                        throw new Exception("player not exists in romm: " + id + " => " + ID);
+
+                    var a = movableObjs[id];
+                    a.Turn2Dir = dirTo;
+                    a.TurnV = turnV;
+
+                    Boardcast("Turn2", (buff) => { buff.Write(id); buff.Write(dirTo.x); buff.Write(dirTo.y); buff.Write(turnV); });
+                });
+            });
         }
     }
 }

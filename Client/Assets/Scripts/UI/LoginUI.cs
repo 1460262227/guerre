@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Guerre;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +28,7 @@ public class LoginUI : UIBase {
                 return;
             }
 
-            APIs.RequestImpl("LoginMgr", "login", (buff) =>
+            APIs.Request("LoginMgr", "login", (buff) =>
             {
                 buff.Write(acc);
                 buff.Write(pwd);

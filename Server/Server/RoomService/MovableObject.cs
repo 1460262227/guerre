@@ -23,11 +23,18 @@ namespace Server
         // 移动速率
         public float Velocity { get; set; }
 
+        // 角速度
+        public float TurnV { get; set; }
+
         // 当前位置
         public Vec2 Pos { get; set; }
 
         // 当前方向(沿 x 正方向顺时针，弧度)
         public float Dir { get; set; }
+
+        // 转向目标方向
+        public Vec2 Turn2Dir { get; set; }
+
 
         // 当前方向的 Vector2 表达
         public Vec2 DirV2
@@ -46,6 +53,13 @@ namespace Server
         // 沿当前方向移动一段距离
         public void MoveForward(float te)
         {
+            // 更新角度
+            if (TurnV != 0)
+            {
+                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, TurnV);
+                Dir += da;
+            }
+
             var d = te * Velocity;
             var dx = (float)Math.Cos(Dir) * d;
             var dy = (float)Math.Sin(Dir) * d;

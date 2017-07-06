@@ -18,6 +18,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
 
     // 当前摇杆操作位置
     public Vector2 CurrentPos = Vector2.zero;
+    public bool Pressed { get { return pressed; } }
 
     RectTransform rt = null;
     RectTransform fgRt = null;

@@ -10,7 +10,7 @@ namespace Server
     /// <summary>
     /// 管理游戏房间逻辑
     /// </summary>
-    public class GameRoomManager : Component, IFrameDrived
+    public class GameRoomManager : ServerMessageHandlerComponent, IFrameDrived
     {
         public GameRoomContainer GRC = null;
 
@@ -21,8 +21,9 @@ namespace Server
                 throw new Exception("Game room id conflict: " + id);
 
             var gr = new GameRoom(id);
+            gr.SC = SC;
             GRC[id] = gr;
-            AddChildComponent(id, gr);
+            AddComponent("GameRoom/" + id, gr);
             return gr;
         }
 
