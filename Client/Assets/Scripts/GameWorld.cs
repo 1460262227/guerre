@@ -98,12 +98,12 @@ public class GameWorld : MonoBehaviour {
     int timeTime = 1; // 加速播放的倍数
     public void OnTimeElapsed(Fix64 te)
     {
-        // 推动物体平滑表现
+        //// 推动物体平滑表现
         foreach (var mo in movingObjs.Values)
             mo.UpdateSmoothly((float)te);
 
-        // 等待服务器指令
-        if (curCmdIndex >= commanders.Count)
+        // 等待至少一条服务器指令
+        if (curCmdIndex >= commanders.Count - 1)
             return;
 
         timeElapsed += (ulong)(long)(te * 1000 * timeTime);
@@ -115,12 +115,17 @@ public class GameWorld : MonoBehaviour {
             foreach (var mo in movingObjs.Values)
                 mo.MoveForward(0.1f);
 
+            // 打印调试信息
+            //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
+            //foreach (var obj in movingObjs.Values)
+            //    Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+
             // 处理指令
             ProcessCommands();
 
             timeElapsed = timeElapsed % 100;
             curCmdIndex++;
-            timeTime = commanders.Count - curCmdIndex + 1; // 延迟了就加速追
+            timeTime = commanders.Count - curCmdIndex; // 延迟了就加速追
         }
     }
 
@@ -178,11 +183,11 @@ public class GameWorld : MonoBehaviour {
             var id = ids[i];
             var type = types[i];
             var pos = poses[i];
-            var dir = dirs[i];
             var v = vs[i];
+            var dir = dirs[i];
             var dirTo = dirTos[i];
             var tv = turnVs[i];
-            Add(0, id, type, pos, dir, v, dirTo, tv);
+            Add(0, id, type, pos, v, dir, dirTo, tv);
         });
     }
 

@@ -107,6 +107,11 @@ namespace Server
             // 处理房间内所有物体逻辑
             ProcessAll(0.1f);
 
+            // 打印调试信息
+            //Console.WriteLine("== t == " + timeNumber);
+            //foreach (var obj in movableObjs.Values)
+            //    Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+
             // 处理这一帧的所有指令
             foreach (var op in ops)
                 op();
@@ -149,16 +154,16 @@ namespace Server
                 buff.Write(movableObjs.Count);
                 foreach (var id in movableObjs.Keys)
                 {
-                    var a = movableObjs[id];
-                    buff.Write(id);
-                    buff.Write(a.Type);
-                    buff.Write(a.Pos.x);
-                    buff.Write(a.Pos.y);
-                    buff.Write(a.Velocity);
-                    buff.Write(a.Dir);
-                    buff.Write(a.Turn2Dir.x);
-                    buff.Write(a.Turn2Dir.y);
-                    buff.Write(a.TurnV);
+                    var obj = movableObjs[id];
+                    buff.Write(obj.ID);
+                    buff.Write(obj.Type);
+                    buff.Write(obj.Pos.x);
+                    buff.Write(obj.Pos.y);
+                    buff.Write(obj.Velocity);
+                    buff.Write(obj.Dir);
+                    buff.Write(obj.Turn2Dir.x);
+                    buff.Write(obj.Turn2Dir.y);
+                    buff.Write(obj.TurnV);
                 }
             });
         }
