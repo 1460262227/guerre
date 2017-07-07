@@ -17,7 +17,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     public Transform Bg = null;
 
     // 当前摇杆操作位置
-    public Vector2 CurrentPos = Vector2.zero;
+    public Vec2 CurrentPos = Vec2.Zero;
     public bool Pressed { get { return pressed; } }
 
     RectTransform rt = null;
@@ -50,8 +50,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
         if (Mathf.Abs(len) > 0.5f)
             v2 = v2 / 2 / Mathf.Abs(len);
 
-        CurrentPos = v2;
-        fgRt.anchorMin = fgRt.anchorMax = CurrentPos + new Vector2(0.5f, 0.5f);
+        CurrentPos = new Vec2(v2.x, v2.y);
+        fgRt.anchorMin = fgRt.anchorMax = v2 + new Vector2(0.5f, 0.5f);
     }
 
     public void OnPointerDown(PointerEventData eventData)

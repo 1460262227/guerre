@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Swift.Math;
 
 namespace Swift
 {
@@ -33,6 +34,8 @@ namespace Swift
 		ulong[] ReadULongArr();
         float ReadFloat();
         float[] ReadFloatArr();
+        Fix64 ReadFix64();
+        Fix64[] ReadFix64Arr();
         double ReadDouble();
         double[] ReadDoubleArr();
         char ReadChar();
@@ -79,6 +82,8 @@ namespace Swift
         void Write(char[] v);
         void Write(string v);
         void Write(string[] v);
+        void Write(Fix64 v);
+        void Write(Fix64[] v);
         //void Write(ISerializable v);
         //void Write(ISerializable[] v);
     }

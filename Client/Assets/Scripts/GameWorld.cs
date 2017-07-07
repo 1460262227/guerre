@@ -22,7 +22,7 @@ public class GameWorld : MonoBehaviour {
     Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
 
     // 客户端的游戏世界时间流失
-    int timeElapsed = 0;
+    Fix64 timeElapsed = 0;
 
     private void Update()
     {
@@ -30,7 +30,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 添加一个物体
-    public void AddObject(string id, string type, Vec2 pos, float velocity, float dir, Vec2 dirTo, float turnV)
+    public void AddObject(string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 turnV)
     {
         if (movingObjs.ContainsKey(id))
             throw new Exception("object id conflicted: " + id);
@@ -96,7 +96,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 推动表现
-    public void OnTimeElapsed(float te)
+    public void OnTimeElapsed(Fix64 te)
     {
         // 每 100ms 处理一次指令
         if (timeElapsed >= 100)
@@ -109,12 +109,11 @@ public class GameWorld : MonoBehaviour {
                 // 延迟了就加速追
                 timeTime = commanders.Count - curCmdIndex + 1;
             }
-            else
+            else // 指令延迟了，客户端等待
                 return;
         }
 
-        te = te * timeTime;
-        timeElapsed += (int)(te * 1000);
+        timeElapsed += te * 1000;
 
         // 推动飞机运动
         foreach (var mo in movingObjs.Values)
@@ -145,7 +144,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 增加飞机
-    public void Add(int t, string id, string type, Vec2 pos, float velocity, float dir, Vec2 dirTo, float tv)
+    public void Add(int t, string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 tv)
     {
         var cmds = RetrieveCmds(t);
         cmds.Add(() => { AddObject(id, type, pos, velocity, dir, dirTo, tv); });
@@ -165,7 +164,7 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 同步房间状态
-    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, float[] vs, float[] dirs, Vec2[] dirTos, float[] turnVs)
+    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, Fix64[] vs, Fix64[] dirs, Vec2[] dirTos, Fix64[] turnVs)
     {
         timeNumBase = t;
         commanders.Clear();
@@ -184,14 +183,14 @@ public class GameWorld : MonoBehaviour {
     }
 
     // 设置飞机方向
-    public void SetDir(int t, string id, float dir)
+    public void SetDir(int t, string id, Fix64 dir)
     {
         var cmds = RetrieveCmds(t);
         cmds.Add(() => { var mo = movingObjs[id]; mo.Dir = dir; });
     }
 
     // 设置飞机转向指定方向
-    public void Turn2(int t, string id, Vec2 toDir, float tv)
+    public void Turn2(int t, string id, Vec2 toDir, Fix64 tv)
     {
         var cmds = RetrieveCmds(t);
         cmds.Add(() =>
@@ -225,19 +224,19 @@ public class GameWorld : MonoBehaviour {
             var ids = new string[cnt];
             var types = new string[cnt];
             var poses = new Vec2[cnt];
-            var vs = new float[cnt];
-            var dirs = new float[cnt];
+            var vs = new Fix64[cnt];
+            var dirs = new Fix64[cnt];
             var dirTos = new Vec2[cnt];
-            var turnVs = new float[cnt];
+            var turnVs = new Fix64[cnt];
             FC.For(cnt, (i) =>
             {
                 ids[i] = data.ReadString();
                 types[i] = data.ReadString();
-                poses[i] = new Vec2(data.ReadFloat(), data.ReadFloat());
-                vs[i] = data.ReadFloat();
-                dirs[i] = data.ReadFloat();
-                dirTos[i] = new Vec2(data.ReadFloat(), data.ReadFloat());
-                turnVs[i] = data.ReadFloat();
+                poses[i] = new Vec2(data.ReadFix64(), data.ReadFix64());
+                vs[i] = data.ReadFix64();
+                dirs[i] = data.ReadFix64();
+                dirTos[i] = new Vec2(data.ReadFix64(), data.ReadFix64());
+                turnVs[i] = data.ReadFix64();
             });
 
             SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, turnVs);
@@ -248,11 +247,11 @@ public class GameWorld : MonoBehaviour {
         {
             var id = data.ReadString();
             var type = data.ReadString();
-            var pos = new Vec2(data.ReadFloat(), data.ReadFloat());
-            var v = data.ReadFloat();
-            var dir = data.ReadFloat();
-            var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
-            var tv = data.ReadFloat();
+            var pos = new Vec2(data.ReadFix64(), data.ReadFix64());
+            var v = data.ReadFix64();
+            var dir = data.ReadFix64();
+            var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
+            var tv = data.ReadFix64();
 
             Add(t, id, type, pos, v, dir, dirTo, tv);
         });
@@ -260,8 +259,8 @@ public class GameWorld : MonoBehaviour {
         OnOp("Turn2", (t, data) =>
         {
             var id = data.ReadString();
-            var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
-            var tv = data.ReadFloat();
+            var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
+            var tv = data.ReadFix64();
             Turn2(t, id, dirTo, tv);
         });
     }

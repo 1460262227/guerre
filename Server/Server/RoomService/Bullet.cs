@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Swift;
+using Swift.Math;
 
 namespace Server
 {
@@ -14,7 +16,7 @@ namespace Server
         public override string Type => "Bullet";
 
         // 剩余的射程
-        public float RangeLeft = 0;
+        public Fix64 RangeLeft = 0;
 
         public override void Init()
         {
@@ -23,7 +25,7 @@ namespace Server
         }
 
         // 沿当前方向移动一段距离
-        public override void OnTimeElapsed(float te)
+        public override void OnTimeElapsed(Fix64 te)
         {
             var d = MoveForward(te);
             RangeLeft -= d;

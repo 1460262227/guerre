@@ -14,10 +14,10 @@ public class MovableObject : MonoBehaviour
     public string ID { get; set; }
 
     // 移动速率
-    public float Velocity { get; set; }
+    public Fix64 Velocity { get; set; }
 
     // 角速度
-    public float TurnV { get; set; }
+    public Fix64 TurnV { get; set; }
 
     // 转向目标方向
     public Vec2 Turn2Dir { get; set; }
@@ -27,17 +27,17 @@ public class MovableObject : MonoBehaviour
     {
         get
         {
-            var p = transform.localPosition;
-            return new Vec2(p.x, p.y);
+            return pos;
         }
         set
         {
-            transform.localPosition = new Vector3(value.x, value.y, 0);
+            pos = value;
+            transform.localPosition = new Vector3((float)value.x, (float)value.y, 0);
         }
-    }
+    } Vec2 pos = Vec2.Zero;
 
     // 当前方向(沿 x 正方向顺时针，弧度)
-    public float Dir
+    public Fix64 Dir
     {
         get
         {
@@ -46,9 +46,9 @@ public class MovableObject : MonoBehaviour
         set
         {
             dir = value;
-            transform.localRotation = Quaternion.Euler(0, 0, value * MathEx.Rad2Deg);
+            transform.localRotation = Quaternion.Euler(0, 0, (float)(value * MathEx.Rad2Deg));
         }
-    } float dir = 0;
+    } Fix64 dir = 0;
 
     // 当前方向的 Vector2 表达
     public Vec2 DirV2
@@ -56,7 +56,7 @@ public class MovableObject : MonoBehaviour
         get
         {
             var dir = Dir;
-            return new Vec2(Mathf.Cos(dir), Mathf.Sin(dir));
+            return new Vec2(MathEx.Cos(dir), MathEx.Sin(dir));
         }
         set
         {
@@ -65,7 +65,7 @@ public class MovableObject : MonoBehaviour
     }
 
     // 沿当前方向移动一段距离
-    public void MoveForward(float te)
+    public void MoveForward(Fix64 te)
     {
         var dist = te * Velocity;
 
@@ -80,10 +80,10 @@ public class MovableObject : MonoBehaviour
     }
 
     // 沿当前方向移动
-    public void MoveForwardOnDir(float d)
+    public void MoveForwardOnDir(Fix64 d)
     {
-        var dx = Mathf.Cos(Dir) * d;
-        var dy = Mathf.Sin(Dir) * d;
+        var dx = MathEx.Cos(Dir) * d;
+        var dy = MathEx.Sin(Dir) * d;
         Pos += new Vec2(dx, dy);
 
         Debug.Log("pos = " + Pos.x + ", " + Pos.y);

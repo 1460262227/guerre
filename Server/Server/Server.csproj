@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Swift\Math\Fixed64.cs" />
+    <Compile Include="Common\Swift\Math\FixedSinLut.cs" />
+    <Compile Include="Common\Swift\Math\FixedTanLut.cs" />
     <Compile Include="Common\Swift\Math\Vec3.cs" />
     <Compile Include="RoomService\Airplane.cs" />
     <Compile Include="Common\Ext.cs" />

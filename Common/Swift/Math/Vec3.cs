@@ -7,9 +7,9 @@ namespace Swift.Math
     // 3D 浮点向量
     public struct Vec3
     {
-        public float x;
-        public float y;
-        public float z;
+        public Fix64 x;
+        public Fix64 y;
+        public Fix64 z;
 
         public Vec3(float vx, float vy, float vz)
         {
@@ -18,11 +18,18 @@ namespace Swift.Math
             z = vz;
         }
 
-        public float Length
+        public Vec3(Fix64 vx, Fix64 vy, Fix64 vz)
+        {
+            x = vx;
+            y = vy;
+            z = vz;
+        }
+
+        public Fix64 Length
         {
             get
             {
-                return (float)System.Math.Sqrt(x * x + y * y + z * z);
+                return Fix64.Sqrt(x * x + y * y + z * z);
             }
         }
 
@@ -36,17 +43,17 @@ namespace Swift.Math
             return new Vec3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
         }
 
-        public static Vec3 operator *(Vec3 v, float scale)
+        public static Vec3 operator *(Vec3 v, Fix64 scale)
         {
             return new Vec3(v.x * scale , v.y * scale, v.z * scale);
         }
 
-        public static Vec3 operator *(float scale, Vec3 v)
+        public static Vec3 operator *(Fix64 scale, Vec3 v)
         {
             return new Vec3(v.x * scale, v.y * scale, v.z * scale);
         }
 
-        public static Vec3 operator /(Vec3 v, float scale)
+        public static Vec3 operator /(Vec3 v, Fix64 scale)
         {
             return new Vec3(v.x / scale, v.y / scale, v.z / scale);
         }
@@ -79,7 +86,7 @@ namespace Swift.Math
         public void Normalize()
         {
             var len = Length;
-            if (System.Math.Abs(len) > float.Epsilon)
+            if (len != 0)
             {
                 x /= len;
                 y /= len;
@@ -92,16 +99,16 @@ namespace Swift.Math
                 z = 0;
             }
         }
-        public static void DistanceSquared(ref Vec3 value1, ref Vec3 value2, out float result)
+        public static void DistanceSquared(ref Vec3 value1, ref Vec3 value2, out Fix64 result)
         {
             result = (value1.x - value2.x) * (value1.x - value2.x) +
                      (value1.y - value2.y) * (value1.y - value2.y) +
                      (value1.z - value2.z) * (value1.z - value2.z);
         }
 
-        public float LengthSquared()
+        public Fix64 LengthSquared()
         {
-            float result;
+            Fix64 result;
             DistanceSquared(ref this, ref Zero, out result);
             return result;
         }
@@ -127,19 +134,19 @@ namespace Swift.Math
 
         public static void Normalize(ref Vec3 value, out Vec3 result)
         {
-            float factor = value.Length;
+            Fix64 factor = value.Length;
             factor = 1f / factor;
             result.x = value.x * factor;
             result.y = value.y * factor;
             result.z = value.z * factor;
         }
 
-        public static float Dot(Vec3 v1, Vec3 v2)
+        public static Fix64 Dot(Vec3 v1, Vec3 v2)
         {
             return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
         }
 
-        public static void Dot(ref Vec3 v1, ref Vec3 v2, out float r)
+        public static void Dot(ref Vec3 v1, ref Vec3 v2, out Fix64 r)
         {
             r = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
         }

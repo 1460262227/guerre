@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Swift;
+using Swift.Math;
 
 // 处理玩家的操控信息
 public class ControlHandler : MonoBehaviour
@@ -17,7 +19,7 @@ public class ControlHandler : MonoBehaviour
             if (pressedLasttime)
             {
                 pressedLasttime = false;
-                APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(0); buff.Write(0); buff.Write(0); });
+                APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(Fix64.Zero); buff.Write(Fix64.Zero); buff.Write(Fix64.Zero); });
             }
 
             return;
@@ -27,7 +29,7 @@ public class ControlHandler : MonoBehaviour
         var dir = JS.CurrentPos;
         dir.Normalize();
 
-        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write(5f); });
+        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write((Fix64)5); });
     }
 
     // 使用技能

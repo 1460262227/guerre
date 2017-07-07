@@ -5,43 +5,24 @@ namespace Swift.Math
     // 零碎扩展
     public static class MathEx
     {
-        public const float Pi = (float) System.Math.PI;
-        public const float HalfPi = Pi / 2;
-        public const float Pi2 = Pi * 2;
+        public static readonly Fix64 Pi = Fix64.Pi;
+        public static readonly Fix64 HalfPi = Pi / 2;
+        public static readonly Fix64 Pi2 = Pi * 2;
 
-        public const float Left = Pi;
-        public const float Right = 0;
-        public const float Up = HalfPi;
-        public const float Down = HalfPi + Pi;
+        public static readonly Fix64 Left = Fix64.Pi;
+        public static readonly Fix64 Right = Fix64.Zero;
+        public static readonly Fix64 Up = HalfPi;
+        public static readonly Fix64 Down = HalfPi + Pi;
 
-        public const float Rad2Deg = 180 / Pi;
-        public const float Deg2Rad = Pi / 180;
+        public static readonly Fix64 Rad2Deg = 180 / Pi;
+        public static readonly Fix64 Deg2Rad = Pi / 180;
 
         // 向量所指方向对应的欧拉角(0-2pi)
-        public static float Dir(this Vec2 v)
+        public static Fix64 Dir(this Vec2 v)
         {
-            // 正则化
-            var len = v.Length;
-            var x = v.x / len;
-            var y = v.y / len;
-
-            if (v.Length <= float.Epsilon)
-                return y > 0 ? HalfPi : -HalfPi;
-            else
-            {
-                var tanValue = y / x;
-                var arc = (float)System.Math.Atan(tanValue);
-
-                if (x < 0)
-                    arc += Pi;
-
-                if (arc < 0)
-                    arc += Pi2;
-
-                return arc;
-            }
+            return MathEx.Atan(v.y, v.x);
         }
-        
+
         // 截断到给定范围
         public static float Clamp(this float v, float min, float max)
         {
@@ -53,8 +34,19 @@ namespace Swift.Math
                 return v;
         }
 
+        // 截断到给定范围
+        public static Fix64 Clamp(this Fix64 v, Fix64 min, Fix64 max)
+        {
+            if (v < min)
+                return min;
+            else if (v > max)
+                return max;
+            else
+                return v;
+        }
+
         // 计算转向，从当前朝向转向目标方向，并限制最大转动角度
-        public static float CalcDir4Turn2(Vec2 nowDir, Vec2 turn2Dir, float max)
+        public static Fix64 CalcDir4Turn2(Vec2 nowDir, Vec2 turn2Dir, Fix64 max)
         {
             max = max > 0 ? max : -max;
             var dirFrom = nowDir.Dir();
@@ -66,10 +58,32 @@ namespace Swift.Math
             else if (tv < -MathEx.Pi)
                 tv += MathEx.Pi2;
 
-            if ((float)System.Math.Abs(max) < (float)System.Math.Abs(tv))
+            if (Fix64.Abs(max) < Fix64.Abs(tv))
                 return tv > 0 ? max : -max;
             else
                 return tv;
+        }
+
+        // 计算三角函数
+
+        public static Fix64 Cos(Fix64 arc)
+        {
+            return Fix64.Cos(arc);
+        }
+
+        public static Fix64 Sin(Fix64 arc)
+        {
+            return Fix64.Sin(arc);
+        }
+
+        public static Fix64 Tan(Fix64 arc)
+        {
+            return Fix64.Tan(arc);
+        }
+
+        public static Fix64 Atan(Fix64 y, Fix64 x)
+        {
+            return Fix64.Atan2(y, x);
         }
     }
 }

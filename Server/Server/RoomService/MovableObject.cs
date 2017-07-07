@@ -26,16 +26,16 @@ namespace Server
         public abstract string Type { get; }
 
         // 移动速率
-        public float Velocity { get; set; }
+        public Fix64 Velocity { get; set; }
 
         // 角速度
-        public float TurnV { get; set; }
+        public Fix64 TurnV { get; set; }
 
         // 当前位置
         public Vec2 Pos { get; set; }
 
         // 当前方向(沿 x 正方向顺时针，弧度)
-        public float Dir { get; set; }
+        public Fix64 Dir { get; set; }
 
         // 转向目标方向
         public Vec2 Turn2Dir { get; set; }
@@ -49,7 +49,7 @@ namespace Server
             get
             {
                 var dir = Dir;
-                return new Vec2((float)Math.Cos(dir), (float)Math.Sin(dir));
+                return new Vec2(MathEx.Cos(dir), MathEx.Sin(dir));
             }
             set
             {
@@ -57,13 +57,13 @@ namespace Server
             }
         }
 
-        public virtual void OnTimeElapsed(float te)
+        public virtual void OnTimeElapsed(Fix64 te)
         {
             MoveForward(te);
         }
 
         // 沿当前方向移动一段距离
-        public virtual float MoveForward(float te)
+        public virtual Fix64 MoveForward(Fix64 te)
         {
             // 更新角度
             if (TurnV != 0)
@@ -73,8 +73,8 @@ namespace Server
             }
 
             var d = te * Velocity;
-            var dx = (float)Math.Cos(Dir) * d;
-            var dy = (float)Math.Sin(Dir) * d;
+            var dx = MathEx.Cos(Dir) * d;
+            var dy = MathEx.Sin(Dir) * d;
             var dv = new Vec2(dx, dy);
             Pos += dv;
 

@@ -7,12 +7,16 @@ using Swift.Math;
 
 public class Tester : MonoBehaviour {
 
+    public GameObject LoginUIObj = null;
+    public ControlHandler CH = null;
     public GameWorld GW = null;
     public Joystick JS = null;
 
 	// Use this for initialization
 	void Start () {
-        GW.Add(0, "me", "Aireplane", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 0);
+        LoginUIObj.SetActive(false);
+        CH.enabled = false;
+        GW.Add(0, "me", "Airplane", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 0);
         StartCoroutine(PushTime(1));
     }
 
@@ -21,7 +25,7 @@ public class Tester : MonoBehaviour {
         int t = start;
         while (true)
         {
-            if (JS.CurrentPos != Vector2.zero)
+            if (JS.CurrentPos != Vec2.Zero)
             {
                 var toDir = new Vec2(JS.CurrentPos.x, JS.CurrentPos.y);
                 toDir.Normalize();

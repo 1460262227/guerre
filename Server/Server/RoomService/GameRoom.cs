@@ -119,7 +119,7 @@ namespace Server
         }
 
         // 处理房间内物件逻辑
-        void ProcessAll(float te)
+        void ProcessAll(Fix64 te)
         {
             var toBeRemoved = new List<MovableObject>();
             foreach (var obj in movableObjs.Values)
@@ -175,8 +175,8 @@ namespace Server
             OnOp("Turn2", (Session s, IReadableBuffer data) =>
             {
                 var id = s.ID;
-                var dirTo = new Vec2(data.ReadFloat(), data.ReadFloat());
-                var turnV = data.ReadFloat();
+                var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
+                var turnV = data.ReadFix64();
                 ops.Add(() =>
                 {
                     var a = movableObjs[id];

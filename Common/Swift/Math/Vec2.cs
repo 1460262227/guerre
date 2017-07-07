@@ -7,8 +7,8 @@ namespace Swift.Math
     // 2D 浮点向量
     public struct Vec2
     {
-        public float x;
-        public float y;
+        public Fix64 x;
+        public Fix64 y;
 
         public Vec2(float vx, float vy)
         {
@@ -16,11 +16,17 @@ namespace Swift.Math
             y = vy;
         }
 
-        public float Length
+        public Vec2(Fix64 vx, Fix64 vy)
+        {
+            x = vx;
+            y = vy;
+        }
+
+        public Fix64 Length
         {
             get
             {
-                return (float)System.Math.Sqrt(x * x + y * y);
+                return Fix64.Sqrt(x * x + y * y);
             }
         }
 
@@ -34,17 +40,17 @@ namespace Swift.Math
             return new Vec2(v1.x - v2.x, v1.y - v2.y);
         }
 
-        public static Vec2 operator *(Vec2 v, float scale)
+        public static Vec2 operator *(Vec2 v, Fix64 scale)
         {
             return new Vec2(v.x * scale, v.y * scale);
         }
 
-        public static Vec2 operator *(float scale, Vec2 v)
+        public static Vec2 operator *(Fix64 scale, Vec2 v)
         {
             return new Vec2(v.x * scale, v.y * scale);
         }
 
-        public static Vec2 operator /(Vec2 v, float scale)
+        public static Vec2 operator /(Vec2 v, Fix64 scale)
         {
             return new Vec2(v.x / scale, v.y / scale);
         }
@@ -77,7 +83,7 @@ namespace Swift.Math
         public void Normalize()
         {
             var len = Length;
-            if (System.Math.Abs(len) > float.Epsilon)
+            if (len != 0)
             {
                 x /= len;
                 y /= len;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using Swift.Math;
 
 namespace Swift
 {
@@ -200,6 +201,26 @@ namespace Swift
                 Write(arr.Length);
                 foreach (float v in arr)
                     Write(v);
+            }
+        }
+
+        public void Write(Fix64 v)
+        {
+            Write(v.RawValue);
+        }
+
+        public void Write(Fix64[] arr)
+        {
+            lock (this)
+            {
+                if (arr == null)
+                    Write(-1);
+                else
+                {
+                    Write(arr.Length);
+                    foreach (Fix64 v in arr)
+                        Write(v.RawValue);
+                }
             }
         }
 
