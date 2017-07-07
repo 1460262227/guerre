@@ -32,7 +32,6 @@ public class MovableObject : MonoBehaviour
         set
         {
             pos = value;
-            transform.localPosition = new Vector3((float)value.x, (float)value.y, 0);
         }
     } Vec2 pos = Vec2.Zero;
 
@@ -46,7 +45,6 @@ public class MovableObject : MonoBehaviour
         set
         {
             dir = value;
-            transform.localRotation = Quaternion.Euler(0, 0, (float)(value * MathEx.Rad2Deg));
         }
     } Fix64 dir = 0;
 
@@ -77,6 +75,8 @@ public class MovableObject : MonoBehaviour
         }
 
         MoveForwardOnDir(dist);
+
+        shirfting = true;
     }
 
     // 沿当前方向移动
@@ -85,5 +85,41 @@ public class MovableObject : MonoBehaviour
         var dx = MathEx.Cos(Dir) * d;
         var dy = MathEx.Sin(Dir) * d;
         Pos += new Vec2(dx, dy);
+    }
+
+    public void UpdateImmediately()
+    {
+        transform.localRotation = Quaternion.Euler(0, 0, (float)(dir * MathEx.Rad2Deg));
+        transform.localPosition = new Vector3((float)pos.x, (float)pos.y, 0);
+    }
+
+    bool shirfting = false;
+    public void UpdateSmoothly(float te)
+    {
+        if (!shirfting)
+            return;
+
+        var nowDir = transform.localRotation.eulerAngles.z;
+        var nowPos = transform.localPosition;
+
+        var dd = te * (float)TurnV;
+        var dp = te * (float)Velocity;
+
+        var toDir = (float)(dir);
+        var toPos = new Vector3((float)pos.x, (float)pos.y, 0);
+
+        var dirDist = toDir - nowDir;
+        var posDist = (toPos - nowPos).magnitude;
+
+        var dDiv = dd >= dirDist ? 1 : dd / dirDist;
+        var pDiv = dp >= posDist ? 1 : dp / posDist;
+
+        var d = (toDir - nowDir) * dDiv + nowDir;
+        var p = (toPos - nowPos) * pDiv + nowPos;
+
+        shirfting = pDiv < 1 || dDiv < 1;
+
+        transform.localRotation = Quaternion.Euler(0, 0, (float) (d * MathEx.Rad2Deg));
+        transform.localPosition = new Vector3((float)p.x, (float)p.y, 0);
     }
 }

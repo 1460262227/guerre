@@ -105,7 +105,6 @@ namespace Server
             timeElapsed -= 100;
 
             // 处理房间内所有物体逻辑
-            Console.Write(timeNumber + ": ");
             ProcessAll(0.1f);
 
             // 处理这一帧的所有指令

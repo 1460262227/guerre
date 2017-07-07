@@ -95,6 +95,15 @@ namespace Swift.Math
             }
         }
 
+        // 求垂线(Left 方向)
+        public Vec2 PerpendicularL
+        {
+            get
+            {
+                return new Vec2(-y, x);
+            }
+        }
+
         public static Vec2 Zero = new Vec2(0, 0);
         public static Vec2 Left = new Vec2(-1, 0);
         public static Vec2 Right = new Vec2(1, 0);

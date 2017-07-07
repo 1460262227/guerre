@@ -57,6 +57,7 @@ public class GameWorld : MonoBehaviour {
         a.Velocity = velocity;
         a.Turn2Dir = dirTo;
         a.TurnV = turnV;
+        a.UpdateImmediately();
         movingObjs[id] = a;
     }
 
@@ -97,6 +98,10 @@ public class GameWorld : MonoBehaviour {
     int timeTime = 1; // 加速播放的倍数
     public void OnTimeElapsed(Fix64 te)
     {
+        // 推动物体平滑表现
+        foreach (var mo in movingObjs.Values)
+            mo.UpdateSmoothly((float)te);
+
         // 等待服务器指令
         if (curCmdIndex >= commanders.Count)
             return;
@@ -109,9 +114,6 @@ public class GameWorld : MonoBehaviour {
             // 推动物体逻辑
             foreach (var mo in movingObjs.Values)
                 mo.MoveForward(0.1f);
-
-            if (movingObjs.Count > 0)
-                Debug.Log((curCmdIndex + timeNumBase) + ": " + movingObjs.Values.ElementAt(0).Pos.x + ", " + movingObjs.Values.ElementAt(0).Pos.y);
 
             // 处理指令
             ProcessCommands();

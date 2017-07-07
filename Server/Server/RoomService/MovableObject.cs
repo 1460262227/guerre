@@ -78,8 +78,6 @@ namespace Server
             var dv = new Vec2(dx, dy);
             Pos += dv;
 
-            Console.WriteLine("pos = " + Pos.x + ", " + Pos.y);
-
             return dv.Length;
         }
 

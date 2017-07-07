@@ -29,11 +29,22 @@ namespace Server
             var b = new Bullet();
             BulletNum++;
             b.ID = ID + "/bullet_" + BulletNum;
-            b.Pos = Pos;
+            b.Pos = Pos + DirV2 * 0.3f;
             b.Dir = Dir;
             b.Velocity = 3;
 
+            // b.Pos += DirV2.PerpendicularL * 0.1f;
             Room.AddObject(b);
+
+            //b = new Bullet();
+            //BulletNum++;
+            //b.ID = ID + "/bullet_" + BulletNum;
+            //b.Pos = Pos + DirV2 * 0.3f;
+            //b.Dir = Dir;
+            //b.Velocity = 3;
+
+            //b.Pos += DirV2.PerpendicularL * -0.1f;
+            //Room.AddObject(b);
         }
     }
 }
