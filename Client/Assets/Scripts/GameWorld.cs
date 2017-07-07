@@ -5,6 +5,7 @@ using UnityEngine;
 using Guerre;
 using Swift;
 using Swift.Math;
+using System.Linq;
 
 // 一个游戏世界代表一局游戏
 public class GameWorld : MonoBehaviour {
@@ -22,7 +23,7 @@ public class GameWorld : MonoBehaviour {
     Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
 
     // 客户端的游戏世界时间流失
-    Fix64 timeElapsed = 0;
+    ulong timeElapsed = 0;
 
     private void Update()
     {
@@ -79,48 +80,49 @@ public class GameWorld : MonoBehaviour {
     // 当前指令位置
     int timeNumBase = 0; // 上一次同步房间状态时的时间编号，客户端只能收到此后的消息
     int curCmdIndex = 0;
-    int timeTime = 1; // 加速播放的倍数
 
     // 处理一批指令，间隔固定为 100 毫秒
-    bool ProcessCommands()
+    void ProcessCommands()
     {
         if (curCmdIndex >= commanders.Count)
-            return false;
+            return;
 
         var acts = commanders[curCmdIndex];
         foreach (var act in acts)
             if (act != null)
                 act();
-
-        return true;
     }
 
     // 推动表现
+    int timeTime = 1; // 加速播放的倍数
     public void OnTimeElapsed(Fix64 te)
     {
+        // 等待服务器指令
+        if (curCmdIndex >= commanders.Count)
+            return;
+
+        timeElapsed += (ulong)(long)(te * 1000 * timeTime);
+
         // 每 100ms 处理一次指令
         if (timeElapsed >= 100)
         {
-            if (ProcessCommands())
-            {
-                timeElapsed = timeElapsed % 100;
-                curCmdIndex++;
+            // 推动物体逻辑
+            foreach (var mo in movingObjs.Values)
+                mo.MoveForward(0.1f);
 
-                // 延迟了就加速追
-                timeTime = commanders.Count - curCmdIndex + 1;
-            }
-            else // 指令延迟了，客户端等待
-                return;
+            if (movingObjs.Count > 0)
+                Debug.Log((curCmdIndex + timeNumBase) + ": " + movingObjs.Values.ElementAt(0).Pos.x + ", " + movingObjs.Values.ElementAt(0).Pos.y);
+
+            // 处理指令
+            ProcessCommands();
+
+            timeElapsed = timeElapsed % 100;
+            curCmdIndex++;
+            timeTime = commanders.Count - curCmdIndex + 1; // 延迟了就加速追
         }
-
-        timeElapsed += te * 1000;
-
-        // 推动飞机运动
-        foreach (var mo in movingObjs.Values)
-            mo.MoveForward(te);
     }
 
-    #region 所有可接收的指令接口，需要指明指令编号，共用编号的一组指令认为是同时发生
+    #region 所有可接收的指令接口，需要指明指令编号，共用编号的一组指令按生成的先后顺序执行
 
     // 根据指令编号获取对应指令列表
     List<Action> RetrieveCmds(int t)

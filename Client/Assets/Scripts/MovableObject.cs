@@ -85,7 +85,5 @@ public class MovableObject : MonoBehaviour
         var dx = MathEx.Cos(Dir) * d;
         var dy = MathEx.Sin(Dir) * d;
         Pos += new Vec2(dx, dy);
-
-        Debug.Log("pos = " + Pos.x + ", " + Pos.y);
     }
 }

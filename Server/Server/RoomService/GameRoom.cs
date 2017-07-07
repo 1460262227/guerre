@@ -104,7 +104,8 @@ namespace Server
 
             timeElapsed -= 100;
 
-            // 房间内所有物体移动 100 毫秒
+            // 处理房间内所有物体逻辑
+            Console.Write(timeNumber + ": ");
             ProcessAll(0.1f);
 
             // 处理这一帧的所有指令
@@ -115,6 +116,7 @@ namespace Server
 
             // 广播游戏时间编号推进
             Boardcast("GameTimeFowardStep");
+
             timeNumber++;
         }
 

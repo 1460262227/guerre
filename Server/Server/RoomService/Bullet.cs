@@ -21,7 +21,7 @@ namespace Server
         public override void Init()
         {
             base.Init();
-            RangeLeft = 2;
+            RangeLeft = 3;
         }
 
         // 沿当前方向移动一段距离
