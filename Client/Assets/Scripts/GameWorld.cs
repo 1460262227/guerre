@@ -8,7 +8,10 @@ using Swift.Math;
 using System.Linq;
 
 // 一个游戏世界代表一局游戏
-public class GameWorld : MonoBehaviour {
+public class GameWorld : MonoBehaviour
+{
+    public static float FrameSec = 0.05f;
+    public static int FrameMS = (int)(FrameSec * 1000);
 
     // 场景根节点
     public Transform SceneRoot = null;
@@ -29,7 +32,7 @@ public class GameWorld : MonoBehaviour {
     Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
 
     // 客户端的游戏世界时间流失
-    ulong timeElapsed = 0;
+    int timeElapsed = 0;
 
     private void Update()
     {
@@ -67,7 +70,10 @@ public class GameWorld : MonoBehaviour {
         movingObjs[id] = a;
 
         if (GameCore.Instance.Me.ID == id)
+        {
             MainCamera.Target = a.transform;
+            GameCore.Instance.MeObj = a;
+        }
     }
 
     // 移除一架飞机
@@ -91,7 +97,7 @@ public class GameWorld : MonoBehaviour {
     int timeNumBase = 0; // 上一次同步房间状态时的时间编号，客户端只能收到此后的消息
     int curCmdIndex = 0;
 
-    // 处理一批指令，间隔固定为 100 毫秒
+    // 处理一批指令，固定间隔时间
     void ProcessCommands()
     {
         if (curCmdIndex >= commanders.Count)
@@ -115,24 +121,24 @@ public class GameWorld : MonoBehaviour {
         if (curCmdIndex >= commanders.Count - 1)
             return;
 
-        timeElapsed += (ulong)(long)(te * 1000 * timeTime);
+        timeElapsed += (int)(te * 1000 * timeTime);
 
-        // 每 100ms 处理一次指令
-        if (timeElapsed >= 100)
+        // 固定间隔时间处理一次指令
+        if (timeElapsed >= FrameMS)
         {
-            // 推动物体逻辑
-            foreach (var mo in movingObjs.Values)
-                mo.MoveForward(0.1f);
-
-            // 打印调试信息
-            //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
-            //foreach (var obj in movingObjs.Values)
-            //    Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
-
             // 处理指令
             ProcessCommands();
 
-            timeElapsed = timeElapsed % 100;
+            // 推动物体逻辑
+            foreach (var mo in movingObjs.Values)
+                mo.MoveForward(FrameSec);
+
+            // 打印调试信息
+            Debug.Log("== t == " + (curCmdIndex + timeNumBase));
+            foreach (var obj in movingObjs.Values)
+                Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+
+            timeElapsed = timeElapsed % FrameMS;
             curCmdIndex++;
             timeTime = commanders.Count - curCmdIndex; // 延迟了就加速追
         }

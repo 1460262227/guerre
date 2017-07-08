@@ -82,10 +82,6 @@ public class MainCamera : MonoBehaviour
     {
         float currRatio = (float)Screen.height / (float)Screen.width;
 
-        // 这2个是相机可见区域
-        float visibleHalfHeight = orthoSize;
-        float visibleHalfWidth = visibleHalfHeight / currRatio;
-
         // 主角的位置，如果x和y设置和主角一样，那么主角刚好居中
         Vector3 tarPos = target.position;
 

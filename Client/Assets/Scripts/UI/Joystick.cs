@@ -40,7 +40,6 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
         
         if (pressed)
         {
-            Debug.Log("pos = " + Input.GetTouch(pointerId).position);
             var pos = (pointerId < 0 ? (Vector2)Input.mousePosition : Input.GetTouch(pointerId).position) - (Vector2)rt.position;
             var rect = bgRt.rect;
             divX = (pos.x / rect.width).Clamp(-0.5f, 0.5f);

@@ -17,7 +17,11 @@ public class MovableObject : MonoBehaviour
     public Fix64 Velocity { get; set; }
 
     // 角速度
-    public Fix64 TurnV { get; set; }
+    public Fix64 TurnV
+    {
+        get { return turnV; }
+        set { turnV = value; preTurnV = value; }
+    } Fix64 turnV;
 
     // 转向目标方向
     public Vec2 Turn2Dir { get; set; }
@@ -32,8 +36,15 @@ public class MovableObject : MonoBehaviour
         set
         {
             pos = value;
+            prePos = value;
         }
     } Vec2 pos = Vec2.Zero;
+
+    public Vec2 PrePos
+    {
+        get { return prePos; }
+        set { prePos = value; }
+    } Vec2 prePos;
 
     // 当前方向(沿 x 正方向顺时针，弧度)
     public Fix64 Dir
@@ -45,6 +56,7 @@ public class MovableObject : MonoBehaviour
         set
         {
             dir = value;
+            preDir = value;
         }
     } Fix64 dir = 0;
 
@@ -61,6 +73,30 @@ public class MovableObject : MonoBehaviour
             Dir = value.Dir();
         }
     }
+
+    public Fix64 PreDir
+    {
+        set
+        {
+            preDir = value;
+        }
+    }  Fix64 preDir = 0;
+
+    public Vec2 PreDirV2
+    {
+        set
+        {
+            preDir = value.Dir();
+        }
+    }
+
+    public Fix64 PreTurnV
+    {
+        set
+        {
+            preTurnV = value;
+        }
+    } Fix64 preTurnV;
 
     // 沿当前方向移动一段距离
     public void MoveForward(Fix64 te)
@@ -102,11 +138,11 @@ public class MovableObject : MonoBehaviour
         var nowDir = transform.localRotation.eulerAngles.z;
         var nowPos = transform.localPosition;
 
-        var dd = te * (float)TurnV;
+        var dd = te * (float)preTurnV;
         var dp = te * (float)Velocity;
 
-        var toDir = (float)(dir);
-        var toPos = new Vector3((float)pos.x, (float)pos.y, 0);
+        var toDir = (float)(preDir);
+        var toPos = new Vector3((float)prePos.x, (float)prePos.y, 0);
 
         var dirDist = toDir - nowDir;
         var posDist = (toPos - nowPos).magnitude;

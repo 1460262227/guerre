@@ -26,10 +26,26 @@ public class ControlHandler : MonoBehaviour
         }
 
         pressedLasttime = true;
-        var dir = JS.CurrentPos;
-        dir.Normalize();
+        var dirV2 = JS.CurrentPos;
+        dirV2.Normalize();
 
-        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write((Fix64)1); });
+        var TurnV = MathEx.Pi2 * 2;
+        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dirV2.x); buff.Write(dirV2.y); buff.Write(TurnV); });
+        var meObj = GameCore.Instance.MeObj;
+
+        // 提前一帧
+        var dt = 0.05f;
+        var dir = dirV2.Dir();
+        var dd = MathEx.CalcDir4Turn2(meObj.DirV2, dirV2, TurnV * dt);
+        var dp = meObj.Velocity * dt;
+
+
+        meObj.PreTurnV = TurnV;
+        meObj.PreDir = meObj.Dir + dd;
+
+        var dx = MathEx.Cos(meObj.Dir + dd) * dp;
+        var dy = MathEx.Sin(meObj.Dir + dd) * dp;
+        meObj.PrePos = meObj.Pos + new Vec2(dx, dy);
     }
 
     // 使用技能

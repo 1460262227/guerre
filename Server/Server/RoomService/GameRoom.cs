@@ -14,6 +14,9 @@ namespace Server
     /// </summary>
     public class GameRoom : ServerMessageHandlerComponent
     {
+        public static float FrameSec = 0.05f;
+        public static int FrameMS = (int)(FrameSec * 1000);
+
         Dictionary<string, MovableObject> movableObjs = new Dictionary<string, MovableObject>();
 
         // 房间 ID
@@ -99,24 +102,24 @@ namespace Server
         public void OnTimeElapsed(int te)
         {
             timeElapsed += te;
-            if (timeElapsed < 100)
+            if (timeElapsed < FrameMS)
                 return;
 
-            timeElapsed -= 100;
-
-            // 处理房间内所有物体逻辑
-            ProcessAll(0.1f);
-
-            // 打印调试信息
-            //Console.WriteLine("== t == " + timeNumber);
-            //foreach (var obj in movableObjs.Values)
-            //    Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+            timeElapsed -= FrameMS;
 
             // 处理这一帧的所有指令
             foreach (var op in ops)
                 op();
 
             ops.Clear();
+
+            // 处理房间内所有物体逻辑
+            ProcessAll(FrameSec);
+
+            // 打印调试信息
+            Console.WriteLine("== t == " + timeNumber);
+            foreach (var obj in movableObjs.Values)
+                Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
 
             // 广播游戏时间编号推进
             Boardcast("GameTimeFowardStep");

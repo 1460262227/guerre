@@ -63,4 +63,5 @@ public class GameCore : Core
     }
 
     public PlayerInfo Me = null;
+    public MovableObject MeObj = null;
 }
