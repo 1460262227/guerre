@@ -32,6 +32,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     }
 
     bool pressed = false; // 摇杆是否按下
+    int pointerId = -1;
     private void Update()
     {
         var divX = 0f;
@@ -39,7 +40,8 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
         
         if (pressed)
         {
-            var pos = Input.mousePosition - rt.position;
+            Debug.Log("pos = " + Input.GetTouch(pointerId).position);
+            var pos = (pointerId < 0 ? (Vector2)Input.mousePosition : Input.GetTouch(pointerId).position) - (Vector2)rt.position;
             var rect = bgRt.rect;
             divX = (pos.x / rect.width).Clamp(-0.5f, 0.5f);
             divY = (pos.y / rect.height).Clamp(-0.5f, 0.5f);
@@ -57,6 +59,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     public void OnPointerDown(PointerEventData eventData)
     {
         pressed = true;
+        pointerId = eventData.pointerId;
     }
 
     public void OnPointerUp(PointerEventData eventData)
