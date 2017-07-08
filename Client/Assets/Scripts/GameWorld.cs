@@ -19,6 +19,12 @@ public class GameWorld : MonoBehaviour {
     // 子弹模型
     public GameObject[] BulletModels = null;
 
+    // 主摄像机
+    public MainCamera MainCamera = null;
+
+    // 地图大小
+    public Vector2 WorldSize = new Vector2(10, 10);
+
     // 当前世界移动物体
     Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
 
@@ -59,6 +65,9 @@ public class GameWorld : MonoBehaviour {
         a.TurnV = turnV;
         a.UpdateImmediately();
         movingObjs[id] = a;
+
+        if (GameCore.Instance.Me.ID == id)
+            MainCamera.Target = a.transform;
     }
 
     // 移除一架飞机

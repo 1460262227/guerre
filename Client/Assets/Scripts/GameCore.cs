@@ -61,4 +61,6 @@ public class GameCore : Core
     {
         RunOneFrame(te);
     }
+
+    public PlayerInfo Me = null;
 }

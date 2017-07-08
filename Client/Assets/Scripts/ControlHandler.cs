@@ -29,7 +29,7 @@ public class ControlHandler : MonoBehaviour
         var dir = JS.CurrentPos;
         dir.Normalize();
 
-        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write((Fix64)5); });
+        APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dir.x); buff.Write(dir.y); buff.Write((Fix64)1); });
     }
 
     // 使用技能

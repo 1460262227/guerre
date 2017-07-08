@@ -1,4 +1,5 @@
 ﻿using Guerre;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,8 +15,9 @@ public class LoginUI : UIBase {
     // 执行登录操作
     public void OnLogin()
     {
-        var ip = IP.text;
-        var port = 9600;
+        var ipport = IP.text.Split(":".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+        var ip = ipport[0];
+        var port = int.Parse(ipport[1]);
         var acc = Acc.text;
         var pwd = Pwd.text;
 
@@ -42,7 +44,12 @@ public class LoginUI : UIBase {
                     conn.Close();
                 }
                 else
+                {
                     Hide();
+                    var pi = new PlayerInfo();
+                    pi.ID = acc;
+                    GameCore.Instance.Me = pi;
+                }
             }, (connected) =>
             {
                 Tips.text = "登录超时";

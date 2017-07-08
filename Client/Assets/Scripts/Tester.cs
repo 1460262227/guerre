@@ -29,7 +29,7 @@ public class Tester : MonoBehaviour {
             {
                 var toDir = new Vec2(JS.CurrentPos.x, JS.CurrentPos.y);
                 toDir.Normalize();
-                GW.Turn2(t, "me", toDir, 5);
+                GW.Turn2(t, "me", toDir, 1);
             }
             else
                 GW.Turn2(t, "me", Vec2.Zero, 0);

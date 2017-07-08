@@ -10,7 +10,7 @@ namespace Server
 
             // 构建服务器
             Server srv = new Server();
-            ServerBuilder.BuildGameServer(srv, "127.0.0.1", 9600);
+            ServerBuilder.BuildGameServer(srv, "0.0.0.0", int.Parse(args[1]));
 
             // 启动服务器
             srv.Start();
