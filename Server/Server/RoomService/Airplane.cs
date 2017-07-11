@@ -12,39 +12,39 @@ namespace Server
     {
         public override string Type => "Airplane";
 
-        public int BulletNum = 0;
+        public uint BulletNum = 0;
+
+        public override void Init()
+        {
+            base.Init();
+
+            Velocity = 1;
+            MaxHp = 10;
+            Hp = 10;
+            Power = 10;
+            Radius = 0.3f;
+        }
 
         public void UseSkill(string skillName)
         {
             switch(skillName)
             {
                 case "gun":
-                    AddBullet();
+                    Shot();
                     break;
             }
         }
 
-        void AddBullet()
+        // 机枪射击
+        void Shot()
         {
-            var b = new Bullet();
+            var b = new SmallBullet();
             BulletNum++;
             b.ID = ID + "/bullet_" + BulletNum;
-            b.Pos = Pos + DirV2 * 0.3f;
+            b.Pos = Pos + DirV2 * 0.35f;
             b.Dir = Dir;
-            b.Velocity = 3;
 
-            // b.Pos += DirV2.PerpendicularL * 0.1f;
             Room.AddObject(b);
-
-            //b = new Bullet();
-            //BulletNum++;
-            //b.ID = ID + "/bullet_" + BulletNum;
-            //b.Pos = Pos + DirV2 * 0.3f;
-            //b.Dir = Dir;
-            //b.Velocity = 3;
-
-            //b.Pos += DirV2.PerpendicularL * -0.1f;
-            //Room.AddObject(b);
         }
     }
 }

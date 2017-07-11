@@ -46,6 +46,10 @@ public class MovableObject : MonoBehaviour
         set { prePos = value; }
     } Vec2 prePos;
 
+    public virtual Fix64 Hp { get; set; }
+    public Fix64 MaxHp { get; set; }
+    public Fix64 Power { get; set; }
+
     // 当前方向(沿 x 正方向顺时针，弧度)
     public Fix64 Dir
     {
@@ -125,9 +129,12 @@ public class MovableObject : MonoBehaviour
 
     public void UpdateImmediately()
     {
-        transform.localRotation = Quaternion.Euler(0, 0, (float)(dir * MathEx.Rad2Deg));
-        transform.localPosition = new Vector3((float)pos.x, (float)pos.y, 0);
+        ShowRotation = Quaternion.Euler(0, 0, (float)(dir * MathEx.Rad2Deg));
+        ShowPosition = new Vector3((float)pos.x, (float)pos.y, 0);
     }
+
+    public virtual Quaternion ShowRotation { get { return transform.localRotation; } set { transform.localRotation = value; } }
+    public virtual Vector3 ShowPosition { get { return transform.localPosition; } set { transform.localPosition = value; } }
 
     bool shirfting = false;
     public void UpdateSmoothly(float te)
@@ -135,27 +142,28 @@ public class MovableObject : MonoBehaviour
         if (!shirfting)
             return;
 
-        var nowDir = transform.localRotation.eulerAngles.z;
-        var nowPos = transform.localPosition;
+        var nowDir = ShowRotation.eulerAngles.z * MathEx.Deg2Rad;
+        var nowPos = ShowPosition;
 
-        var dd = te * (float)preTurnV;
-        var dp = te * (float)Velocity;
+        var dd = te * preTurnV;
+        var dp = te * Velocity;
 
-        var toDir = (float)(preDir);
+        var toDir = preDir;
         var toPos = new Vector3((float)prePos.x, (float)prePos.y, 0);
 
-        var dirDist = toDir - nowDir;
+        var dirDist = (toDir - nowDir).RangeInPi();
+        var dirDistAbs = dirDist.Abs();
         var posDist = (toPos - nowPos).magnitude;
 
-        var dDiv = dd >= dirDist ? 1 : dd / dirDist;
+        var dDiv = dd >= dirDistAbs ? 1 : dd / dirDistAbs;
         var pDiv = dp >= posDist ? 1 : dp / posDist;
 
-        var d = (toDir - nowDir) * dDiv + nowDir;
-        var p = (toPos - nowPos) * pDiv + nowPos;
+        var d = dirDist * dDiv + nowDir;
+        var p = (toPos - nowPos) * (float)pDiv + nowPos;
 
         shirfting = pDiv < 1 || dDiv < 1;
 
-        transform.localRotation = Quaternion.Euler(0, 0, (float) (d * MathEx.Rad2Deg));
-        transform.localPosition = new Vector3((float)p.x, (float)p.y, 0);
+        ShowRotation = Quaternion.Euler(0, 0, (float) (d * MathEx.Rad2Deg));
+        ShowPosition = new Vector3((float)p.x, (float)p.y, 0);
     }
 }

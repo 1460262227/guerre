@@ -26,7 +26,15 @@ namespace Swift.Math
         {
             get
             {
-                return Fix64.Sqrt(x * x + y * y);
+                return Fix64.Sqrt(Length2);
+            }
+        }
+
+        public Fix64 Length2
+        {
+            get
+            {
+                return x * x + y * y;
             }
         }
 

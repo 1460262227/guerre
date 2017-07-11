@@ -43,6 +43,31 @@ namespace Server
         // 可以移除了
         public bool ToBeRemoved { get; set; }
 
+        // 尺寸半径
+        public Fix64 Radius
+        {
+            get { return r; }
+            set { r = value; r2 = r * r; }
+        } Fix64 r;
+        public Fix64 Radius2 { get { return r2; } } Fix64 r2;
+
+        // 破坏力
+        public Fix64 Power { get; set; }
+
+        // 生命值
+        public Fix64 MaxHp
+        {
+            get { return maxHp; }
+            set { maxHp = value; }
+        } Fix64 maxHp;
+
+        // 生命值
+        public Fix64 Hp
+        {
+            get { return hp; }
+            set { hp = value; ToBeRemoved = ToBeRemoved || hp <= 0; }
+        } Fix64 hp;
+
         // 当前方向的 Vector2 表达
         public Vec2 DirV2
         {
@@ -51,10 +76,7 @@ namespace Server
                 var dir = Dir;
                 return new Vec2(MathEx.Cos(dir), MathEx.Sin(dir));
             }
-            set
-            {
-                Dir = value.Dir();
-            }
+            set { Dir = value.Dir(); }
         }
 
         public virtual void OnTimeElapsed(Fix64 te)
@@ -85,11 +107,27 @@ namespace Server
         {
             Pos = Vec2.Zero;
             Dir = MathEx.HalfPi;
-            Velocity = 1;
             Turn2Dir = Vec2.Zero;
             TurnV = 0;
             ToBeRemoved = false;
             Room = null;
+        }
+
+        // 判断碰撞情况
+        public virtual bool CheckCollide(MovableObject obj)
+        {
+            return false;
+        }
+
+        // 执行碰撞操作
+        public virtual bool DoCollide(MovableObject obj)
+        {
+            if (!CheckCollide(obj) && !obj.CheckCollide(this))
+                return false;
+
+            obj.Hp -= Power;
+            Hp -= obj.Power;
+            return true;
         }
 
         public GameRoom Room { get; set; }

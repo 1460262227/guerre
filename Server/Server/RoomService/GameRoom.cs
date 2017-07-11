@@ -70,6 +70,9 @@ namespace Server
                 buff.Write(obj.Turn2Dir.x);
                 buff.Write(obj.Turn2Dir.y);
                 buff.Write(obj.TurnV);
+                buff.Write(obj.MaxHp);
+                buff.Write(obj.Hp);
+                buff.Write(obj.Power);
             });
         }
 
@@ -91,6 +94,9 @@ namespace Server
         {
             ops.Add(() =>
             {
+                if (!movableObjs.ContainsKey(p.ID))
+                    return;
+
                 RemoveObject(p.ID);
                 p.Room = null;
             });
@@ -113,36 +119,70 @@ namespace Server
 
             ops.Clear();
 
-            // 处理房间内所有物体逻辑
+            // 处理房间内物体逻辑
             ProcessAll(FrameSec);
 
             // 打印调试信息
-            Console.WriteLine("== t == " + timeNumber);
-            foreach (var obj in movableObjs.Values)
-                Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+            //Console.WriteLine("== t == " + timeNumber);
+            //foreach (var obj in movableObjs.Values)
+            //    Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
 
-            // 广播游戏时间编号推进
-            Boardcast("GameTimeFowardStep");
+            // 检查碰撞
+            ProcessCollision();
 
-            timeNumber++;
-        }
-
-        // 处理房间内物件逻辑
-        void ProcessAll(Fix64 te)
-        {
+            // 最后做移除操作
             var toBeRemoved = new List<MovableObject>();
-            foreach (var obj in movableObjs.Values)
+            foreach (var k in movableObjs.Keys.ToArray())
             {
-                obj.OnTimeElapsed(te);
+                var obj = movableObjs[k];
                 if (obj.ToBeRemoved)
-                    toBeRemoved.Add(obj);
+                {
+                    movableObjs.Remove(k);
+                    Boardcast("RemoveOut", (buff) => { buff.Write(k); });
+                }
             }
 
-            // 移除该移除的
-            foreach (var obj in toBeRemoved)
-                RemoveObject(obj.ID);
+            // 广播游戏时间编号推进
+            timeNumber++;
+            Boardcast("GameTimeFowardStep");
+        }
 
-            toBeRemoved.Clear();
+        // 处理房间内物体逻辑
+        void ProcessAll(Fix64 te)
+        {
+            foreach (var obj in movableObjs.Values)
+                obj.OnTimeElapsed(te);
+        }
+
+        // 处理碰撞
+        void ProcessCollision()
+        {
+            var needCheck = true;
+            var keys = movableObjs.Keys.ToList();
+
+            while (needCheck)
+            {
+                needCheck = false;
+                var cnt = keys.Count;
+                FC.For(cnt - 1, (i) =>
+                {
+                    var k1 = keys[i];
+                    var obj1 = movableObjs[k1];
+                    FC.For(i + 1, cnt, (j) =>
+                    {
+                        var k2 = keys[j];
+                        var obj2 = movableObjs[k2];
+                        if(obj1.DoCollide(obj2))
+                        {
+                            needCheck = true;
+                            keys.Remove(k2);
+                            keys.Remove(k1);
+
+                            Boardcast("Collision", (buff) => { buff.Write(k1); buff.Write(k2); });
+                        }
+                    }, () => needCheck);
+                }, () => needCheck);
+            }
         }
 
         // 当前帧需要执行的指令
@@ -167,6 +207,9 @@ namespace Server
                     buff.Write(obj.Turn2Dir.x);
                     buff.Write(obj.Turn2Dir.y);
                     buff.Write(obj.TurnV);
+                    buff.Write(obj.MaxHp);
+                    buff.Write(obj.Hp);
+                    buff.Write(obj.Power);
                 }
             });
         }
@@ -188,6 +231,9 @@ namespace Server
                 var turnV = data.ReadFix64();
                 ops.Add(() =>
                 {
+                    if (!movableObjs.ContainsKey(id))
+                        return;
+
                     var a = movableObjs[id];
                     a.Turn2Dir = dirTo;
                     a.TurnV = turnV;
@@ -202,6 +248,9 @@ namespace Server
                 var skillName = data.ReadString();
                 ops.Add(() =>
                 {
+                    if (!movableObjs.ContainsKey(id))
+                        return;
+
                     var a = movableObjs[id] as Airplane;
                     a.UseSkill(skillName);
                 });

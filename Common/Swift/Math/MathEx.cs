@@ -51,17 +51,30 @@ namespace Swift.Math
             max = max > 0 ? max : -max;
             var dirFrom = nowDir.Dir();
             var dirTo = turn2Dir.Dir();
-            var tv = dirTo - dirFrom;
-
-            if (tv > MathEx.Pi)
-                tv -= MathEx.Pi2;
-            else if (tv < -MathEx.Pi)
-                tv += MathEx.Pi2;
-
+            var tv = (dirTo - dirFrom).RangeInPi();
             if (Fix64.Abs(max) < Fix64.Abs(tv))
                 return tv > 0 ? max : -max;
             else
                 return tv;
+        }
+
+        // 将指定角度规范到 [-Pi, Pi)
+        public static Fix64 RangeInPi(this Fix64 dir)
+        {
+            var d = dir;
+            while (d > Pi)
+                d -= Pi2;
+
+            while (d < -Pi)
+                d += Pi2;
+
+            return d;
+        }
+
+        // 取绝对值
+        public static Fix64 Abs(this Fix64 v)
+        {
+            return v >= 0 ? v : -v;
         }
 
         // 计算三角函数

@@ -16,26 +16,30 @@ public class Tester : MonoBehaviour {
 	void Start () {
         LoginUIObj.SetActive(false);
         CH.enabled = false;
-        GW.Add(0, "me", "Airplane", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 0);
+        var me = new PlayerInfo();
+        me.ID = "me";
+        GameCore.Instance.Me = me;
+        GW.Add(0, me.ID, "Airplane", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 0, 10, 10, 10);
         StartCoroutine(PushTime(1));
     }
 
     IEnumerator PushTime(int start)
     {
         int t = start;
+        var me = GameCore.Instance.Me;
         while (true)
         {
             if (JS.CurrentPos != Vec2.Zero)
             {
                 var toDir = new Vec2(JS.CurrentPos.x, JS.CurrentPos.y);
                 toDir.Normalize();
-                GW.Turn2(t, "me", toDir, 1);
+                GW.Turn2(t, me.ID, toDir, 1);
             }
             else
-                GW.Turn2(t, "me", Vec2.Zero, 0);
+                GW.Turn2(t, me.ID, Vec2.Zero, 0);
 
             t++;
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.05f);
         }
     }
 	

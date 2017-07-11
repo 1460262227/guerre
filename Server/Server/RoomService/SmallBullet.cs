@@ -9,9 +9,9 @@ using Swift.Math;
 namespace Server
 {
     /// <summary>
-    /// 子弹
+    /// 小子弹
     /// </summary>
-    public class Bullet : MovableObject
+    public class SmallBullet : MovableObject
     {
         public override string Type => "Bullet";
 
@@ -21,6 +21,11 @@ namespace Server
         public override void Init()
         {
             base.Init();
+
+            Velocity = 3;
+            Radius = 0.1f;
+            Power = 1;
+            MaxHp = Hp = 1;
             RangeLeft = 3;
         }
 
@@ -29,7 +34,14 @@ namespace Server
         {
             var d = MoveForward(te);
             RangeLeft -= d;
-            ToBeRemoved = RangeLeft <= 0;
+            ToBeRemoved = ToBeRemoved || RangeLeft <= 0;
+        }
+
+        // 碰撞
+        public override bool CheckCollide(MovableObject obj)
+        {
+            var d2 = (Pos - obj.Pos).Length2;
+            return d2 < Radius2 + obj.Radius2;
         }
     }
 }

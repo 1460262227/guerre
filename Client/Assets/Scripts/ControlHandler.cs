@@ -29,16 +29,14 @@ public class ControlHandler : MonoBehaviour
         var dirV2 = JS.CurrentPos;
         dirV2.Normalize();
 
-        var TurnV = MathEx.Pi2 * 2;
+        var TurnV = MathEx.Pi2 / 2;
         APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dirV2.x); buff.Write(dirV2.y); buff.Write(TurnV); });
         var meObj = GameCore.Instance.MeObj;
 
         // 提前一帧
         var dt = 0.05f;
-        var dir = dirV2.Dir();
         var dd = MathEx.CalcDir4Turn2(meObj.DirV2, dirV2, TurnV * dt);
         var dp = meObj.Velocity * dt;
-
 
         meObj.PreTurnV = TurnV;
         meObj.PreDir = meObj.Dir + dd;

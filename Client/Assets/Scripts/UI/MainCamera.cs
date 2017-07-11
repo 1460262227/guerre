@@ -80,8 +80,6 @@ public class MainCamera : MonoBehaviour
     // 计算相机位置
     Vector3 CalcCameraPos(float orthoSize)
     {
-        float currRatio = (float)Screen.height / (float)Screen.width;
-
         // 主角的位置，如果x和y设置和主角一样，那么主角刚好居中
         Vector3 tarPos = target.position;
 

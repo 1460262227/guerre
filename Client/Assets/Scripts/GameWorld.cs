@@ -40,7 +40,7 @@ public class GameWorld : MonoBehaviour
     }
 
     // 添加一个物体
-    public void AddObject(string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 turnV)
+    public void AddObject(string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 turnV, Fix64 maxHp, Fix64 hp, Fix64 power)
     {
         if (movingObjs.ContainsKey(id))
             throw new Exception("object id conflicted: " + id);
@@ -66,6 +66,9 @@ public class GameWorld : MonoBehaviour
         a.Velocity = velocity;
         a.Turn2Dir = dirTo;
         a.TurnV = turnV;
+        a.MaxHp = maxHp;
+        a.Hp = hp;
+        a.Power = power;
         a.UpdateImmediately();
         movingObjs[id] = a;
 
@@ -134,9 +137,9 @@ public class GameWorld : MonoBehaviour
                 mo.MoveForward(FrameSec);
 
             // 打印调试信息
-            Debug.Log("== t == " + (curCmdIndex + timeNumBase));
-            foreach (var obj in movingObjs.Values)
-                Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+            //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
+            //foreach (var obj in movingObjs.Values)
+            //    Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
 
             timeElapsed = timeElapsed % FrameMS;
             curCmdIndex++;
@@ -168,10 +171,10 @@ public class GameWorld : MonoBehaviour
     }
 
     // 增加飞机
-    public void Add(int t, string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 tv)
+    public void Add(int t, string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 tv, Fix64 maxHp, Fix64 hp, Fix64 power)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { AddObject(id, type, pos, velocity, dir, dirTo, tv); });
+        cmds.Add(() => { AddObject(id, type, pos, velocity, dir, dirTo, tv, maxHp, hp, power); });
     }
 
     // 移除飞机
@@ -188,7 +191,7 @@ public class GameWorld : MonoBehaviour
     }
 
     // 同步房间状态
-    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, Fix64[] vs, Fix64[] dirs, Vec2[] dirTos, Fix64[] turnVs)
+    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, Fix64[] vs, Fix64[] dirs, Vec2[] dirTos, Fix64[] turnVs, Fix64[] maxHps, Fix64[] hps, Fix64[] powers)
     {
         timeNumBase = t;
         commanders.Clear();
@@ -202,7 +205,10 @@ public class GameWorld : MonoBehaviour
             var dir = dirs[i];
             var dirTo = dirTos[i];
             var tv = turnVs[i];
-            Add(0, id, type, pos, v, dir, dirTo, tv);
+            var maxHp = maxHps[i];
+            var hp = hps[i];
+            var power = powers[i];
+            Add(0, id, type, pos, v, dir, dirTo, tv, maxHp, hp, power);
         });
     }
 
@@ -222,6 +228,19 @@ public class GameWorld : MonoBehaviour
             var mo = movingObjs[id];
             mo.Turn2Dir = toDir;
             mo.TurnV = tv;
+        });
+    }
+
+    // 执行碰撞操作
+    public void Collision(int t, string id1, string id2)
+    {
+        var cmds = RetrieveCmds(t);
+        cmds.Add(() =>
+        {
+            var obj1 = movingObjs[id1];
+            var obj2 = movingObjs[id2];
+            obj1.Hp -= obj2.Power;
+            obj2.Power -= obj1.Power;
         });
     }
 
@@ -252,6 +271,9 @@ public class GameWorld : MonoBehaviour
             var dirs = new Fix64[cnt];
             var dirTos = new Vec2[cnt];
             var turnVs = new Fix64[cnt];
+            var maxHps = new Fix64[cnt];
+            var hps = new Fix64[cnt];
+            var powers = new Fix64[cnt];
             FC.For(cnt, (i) =>
             {
                 ids[i] = data.ReadString();
@@ -261,9 +283,12 @@ public class GameWorld : MonoBehaviour
                 dirs[i] = data.ReadFix64();
                 dirTos[i] = new Vec2(data.ReadFix64(), data.ReadFix64());
                 turnVs[i] = data.ReadFix64();
+                maxHps[i] = data.ReadFix64();
+                hps[i] = data.ReadFix64();
+                powers[i] = data.ReadFix64();
             });
 
-            SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, turnVs);
+            SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, turnVs, maxHps, hps, powers);
         });
 
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
@@ -276,8 +301,11 @@ public class GameWorld : MonoBehaviour
             var dir = data.ReadFix64();
             var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
             var tv = data.ReadFix64();
+            var maxHp = data.ReadFix64();
+            var hp = data.ReadFix64();
+            var power = data.ReadFix64();
 
-            Add(t, id, type, pos, v, dir, dirTo, tv);
+            Add(t, id, type, pos, v, dir, dirTo, tv, maxHp, hp, power);
         });
         OnOp("RemoveOut", (t, data) => { var id = data.ReadString(); Del(t, id);});
         OnOp("Turn2", (t, data) =>
@@ -286,6 +314,12 @@ public class GameWorld : MonoBehaviour
             var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
             var tv = data.ReadFix64();
             Turn2(t, id, dirTo, tv);
+        });
+        OnOp("Collision", (t, data) =>
+        {
+            var k1 = data.ReadString();
+            var k2 = data.ReadString();
+            Collision(t, k1, k2);
         });
     }
 }
