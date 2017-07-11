@@ -29,7 +29,7 @@ public class ControlHandler : MonoBehaviour
         var dirV2 = JS.CurrentPos;
         dirV2.Normalize();
 
-        var TurnV = MathEx.Pi2 / 2;
+        var TurnV = MathEx.Pi2 / 4;
         APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dirV2.x); buff.Write(dirV2.y); buff.Write(TurnV); });
         var meObj = GameCore.Instance.MeObj;
 

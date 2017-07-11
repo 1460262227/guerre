@@ -116,7 +116,9 @@ public class GameWorld : MonoBehaviour
     int timeTime = 1; // 加速播放的倍数
     public void OnTimeElapsed(Fix64 te)
     {
-        //// 推动物体平滑表现
+        te *= timeTime;
+
+        // 推动物体平滑表现
         foreach (var mo in movingObjs.Values)
             mo.UpdateSmoothly((float)te);
 
@@ -124,7 +126,7 @@ public class GameWorld : MonoBehaviour
         if (curCmdIndex >= commanders.Count - 1)
             return;
 
-        timeElapsed += (int)(te * 1000 * timeTime);
+        timeElapsed += (int)(te * 1000);
 
         // 固定间隔时间处理一次指令
         if (timeElapsed >= FrameMS)
@@ -141,7 +143,7 @@ public class GameWorld : MonoBehaviour
             //foreach (var obj in movingObjs.Values)
             //    Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
 
-            timeElapsed = timeElapsed % FrameMS;
+            timeElapsed -= FrameMS;
             curCmdIndex++;
             timeTime = commanders.Count - curCmdIndex; // 延迟了就加速追
         }

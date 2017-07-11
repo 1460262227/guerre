@@ -37,19 +37,21 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     {
         var divX = 0f;
         var divY = 0f;
-        
+
+        var moveR = 0.25f;
+
         if (pressed)
         {
             var pos = (pointerId < 0 ? (Vector2)Input.mousePosition : Input.GetTouch(pointerId).position) - (Vector2)rt.position;
             var rect = bgRt.rect;
-            divX = (pos.x / rect.width).Clamp(-0.5f, 0.5f);
-            divY = (pos.y / rect.height).Clamp(-0.5f, 0.5f);
+            divX = (pos.x / rect.width).Clamp(-moveR, moveR);
+            divY = (pos.y / rect.height).Clamp(-moveR, moveR);
         }
 
         var v2 = new Vector2(divX, divY);
         var len = v2.magnitude;
-        if (Mathf.Abs(len) > 0.5f)
-            v2 = v2 / 2 / Mathf.Abs(len);
+        if (Mathf.Abs(len) > moveR)
+            v2 = v2 * moveR / Mathf.Abs(len);
 
         CurrentPos = new Vec2(v2.x, v2.y);
         fgRt.anchorMin = fgRt.anchorMax = v2 + new Vector2(0.5f, 0.5f);

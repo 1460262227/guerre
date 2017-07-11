@@ -17,7 +17,7 @@ public class MovableObject : MonoBehaviour
     public Fix64 Velocity { get; set; }
 
     // 角速度
-    public Fix64 TurnV
+    public virtual Fix64 TurnV
     {
         get { return turnV; }
         set { turnV = value; preTurnV = value; }
