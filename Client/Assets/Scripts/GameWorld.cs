@@ -122,15 +122,15 @@ public class GameWorld : MonoBehaviour
         foreach (var mo in movingObjs.Values)
             mo.UpdateSmoothly((float)te);
 
-        // 等待至少一条服务器指令
-        if (curCmdIndex >= commanders.Count - 1)
-            return;
-
         timeElapsed += (int)(te * 1000);
 
-        // 固定间隔时间处理一次指令
-        if (timeElapsed >= FrameMS)
+        // // 固定间隔时间处理一次指令，处理至少一条服务器指令
+        while (commanders.Count > curCmdIndex + 1 && timeElapsed >= FrameMS)
         {
+            // 推动物体平滑表现
+            foreach (var mo in movingObjs.Values)
+                mo.UpdateSmoothly(FrameSec);
+
             // 处理指令
             ProcessCommands();
 
