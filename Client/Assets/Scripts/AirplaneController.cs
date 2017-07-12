@@ -19,8 +19,8 @@ public class AirplaneController : MovableObjectController
 
     private void LateUpdate()
     {
-        var turn2Dir = MO.TurnV == 0 ? MO.Dir : MO.Turn2Dir.Dir();
-        var nowDir = MO.Dir;
+        var turn2Dir = TurnV == 0 ? Dir : Turn2Dir.Dir();
+        var nowDir = Dir;
         var da = (turn2Dir - nowDir).RangeInPi().Clamp(-1, 1);
         AS.TurnAngle = ((float)(da / MathEx.Pi) + AS.TurnAngle * 4) / 5;
     }

@@ -60,7 +60,7 @@ public class GameWorld : MonoBehaviour
             go = Instantiate(AirplaneModels[1].gameObject) as GameObject;
         else if (type == "Airplane/2")
             go = Instantiate(AirplaneModels[2].gameObject) as GameObject;
-        else if (type == "Bullet")
+        else if (type == "SmallBullet")
             go = Instantiate(BulletModels[0].gameObject) as GameObject;
         else if (type == "Medicine")
             go = Instantiate(Items[0].gameObject) as GameObject;
@@ -230,7 +230,7 @@ public class GameWorld : MonoBehaviour
     public void SetDir(int t, string id, Fix64 dir)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { var mc = movingObjControllers[id]; mc.MO.Dir = dir; });
+        cmds.Add(() => { var mc = movingObjControllers[id]; mc.Dir = dir; });
     }
 
     // 设置飞机转向指定方向
@@ -240,8 +240,8 @@ public class GameWorld : MonoBehaviour
         cmds.Add(() =>
         {
             var mo = movingObjControllers[id];
-            mo.MO.Turn2Dir = toDir;
-            mo.MO.TurnV = tv;
+            mo.Turn2Dir = toDir;
+            mo.TurnV = tv;
         });
     }
 

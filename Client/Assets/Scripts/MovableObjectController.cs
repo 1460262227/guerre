@@ -15,90 +15,86 @@ public class MovableObjectController : MonoBehaviour
 {
     public MovableObjectInfo MO { private get; set; }
 
-    //// 唯一 ID
-    //public string ID { get; set; }
+    // 唯一 ID
+    public string ID { get { return MO.ID; } }
 
-    //// 移动速率
-    //public Fix64 Velocity { get; set; }
+    // 移动速率
+    public Fix64 Velocity { get { return MO.Velocity; } }
 
-    //// 最大角速度
-    //public Fix64 MaxTv { get; set; }
+    // 最大角速度
+    public Fix64 MaxTurnV { get { return MO.MaxTurnV; } }
 
-    //// 角速度
-    //public virtual Fix64 TurnV
-    //{
-    //    get { return turnV; }
-    //    set { turnV = value; preTurnV = value; }
-    //} Fix64 turnV;
-
-    //// 转向目标方向
-    //public Vec2 Turn2Dir { get; set; }
-
-    //// 当前位置
-    //public Vec2 Pos
-    //{
-    //    get
-    //    {
-    //        return pos;
-    //    }
-    //    set
-    //    {
-    //        pos = value;
-    //        prePos = value;
-    //    }
-    //} Vec2 pos = Vec2.Zero;
-
-    public Vec2 PrePos
+    // 角速度
+    public virtual Fix64 TurnV
     {
-        get { return prePos; }
-        set { prePos = value; }
-    } Vec2 prePos;
+        get { return MO.TurnV; }
+        set { MO.TurnV = value; preTurnV = value; }
+    }
 
-    //public virtual Fix64 Hp { get; set; }
-    //public Fix64 MaxHp { get; set; }
-    //public Fix64 Power { get; set; }
-
-    //// 当前方向(沿 x 正方向顺时针，弧度)
-    //public Fix64 Dir
-    //{
-    //    get
-    //    {
-    //        return dir;
-    //    }
-    //    set
-    //    {
-    //        dir = value;
-    //        preDir = value;
-    //    }
-    //} Fix64 dir = 0;
-
-    //// 当前方向的 Vector2 表达
-    //public Vec2 DirV2
-    //{
-    //    get
-    //    {
-    //        var dir = Dir;
-    //        return new Vec2(MathEx.Cos(dir), MathEx.Sin(dir));
-    //    }
-    //    set
-    //    {
-    //        Dir = value.Dir();
-    //    }
-    //}
-
-    public Fix64 PreDir
+    // 转向目标方向
+    public Vec2 Turn2Dir
     {
+        get { return MO.Turn2Dir; }
+        set { MO.Turn2Dir = value; }
+    }
+
+    // 当前位置
+    public Vec2 Pos
+    {
+        get
+        {
+            return MO.Pos;
+        }
         set
         {
-            preDir = value;
+            MO.Pos = value;
+            PrePos = value;
         }
-    }  Fix64 preDir = 0;
+    }
+
+    public Vec2 PrePos { set { prePos = value; } }
+    Vec2 prePos;
+
+    public virtual Fix64 Hp { get { return MO.Hp; } }
+    public Fix64 MaxHp { get { return MO.MaxHp; } }
+    public Fix64 Power { get { return MO.Power; } }
+
+    // 当前方向(沿 x 正方向顺时针，弧度)
+    public Fix64 Dir
+    {
+        get
+        {
+            return MO.Dir;
+        }
+        set
+        {
+            MO.Dir = value;
+            PreDir = value;
+        }
+    }
+
+    public Fix64 PreDir { set { preDir = value; } }
+    Fix64 preDir;
+
+    // 当前方向的 vector2 表达
+    public Vec2 DirV2
+    {
+        get
+        {
+            var dir = Dir;
+            return new Vec2(MathEx.Cos(dir), MathEx.Sin(dir));
+        }
+        set
+        {
+            Dir = value.Dir();
+        }
+    }
 
     public Vec2 PreDirV2
     {
         set
         {
-            preDir = value.Dir();
+            PreDir = value.Dir();
         }
     }
 
@@ -113,13 +109,13 @@ public class MovableObjectController : MonoBehaviour
     // 沿当前方向移动一段距离
     public void MoveForward(Fix64 te)
     {
-        var dist = te * MO.Velocity;
+        var dist = te * Velocity;
 
         // 更新角度
-        if (MO.TurnV != 0)
+        if (TurnV != 0)
         {
-            var da = MathEx.CalcDir4Turn2(MO.DirV2, MO.Turn2Dir, te * MO.TurnV);
-            MO.Dir += da;
+            var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, te * TurnV);
+            Dir += da;
         }
 
         MoveForwardOnDir(dist);
@@ -129,15 +125,15 @@ public class MovableObjectController : MonoBehaviour
     // 沿当前方向移动
     public void MoveForwardOnDir(Fix64 d)
     {
-        var dx = MathEx.Cos(MO.Dir) * d;
-        var dy = MathEx.Sin(MO.Dir) * d;
-        MO.Pos += new Vec2(dx, dy);
+        var dx = MathEx.Cos(Dir) * d;
+        var dy = MathEx.Sin(Dir) * d;
+        Pos += new Vec2(dx, dy);
     }
 
     public void UpdateImmediately()
     {
-        ShowRotation = Quaternion.Euler(0, 0, (float)(MO.Dir * MathEx.Rad2Deg));
-        ShowPosition = new Vector3((float)MO.Pos.x, (float)MO.Pos.y, 0);
+        ShowRotation = Quaternion.Euler(0, 0, (float)(Dir * MathEx.Rad2Deg));
+        ShowPosition = new Vector3((float)Pos.x, (float)Pos.y, 0);
     }
 
     public virtual Quaternion ShowRotation { get { return transform.localRotation; } set { transform.localRotation = value; } }
@@ -153,7 +149,7 @@ public class MovableObjectController : MonoBehaviour
         var nowPos = ShowPosition;
 
         var dd = te * preTurnV;
-        var dp = te * MO.Velocity;
+        var dp = te * Velocity;
 
         var toDir = preDir;
         var toPos = new Vector3((float)prePos.x, (float)prePos.y, 0);

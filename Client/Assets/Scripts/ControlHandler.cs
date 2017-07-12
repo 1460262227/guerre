@@ -29,21 +29,21 @@ public class ControlHandler : MonoBehaviour
         var dirV2 = JS.CurrentPos;
         dirV2.Normalize();
 
-        var TurnV = GameCore.Instance.MeOC.MO.MaxTurnV;
+        var TurnV = GameCore.Instance.MeOC.MaxTurnV;
         APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dirV2.x); buff.Write(dirV2.y); buff.Write(TurnV); });
         var mc = GameCore.Instance.MeOC;
 
         // 提前一帧
         var dt = 0.05f;
-        var dd = MathEx.CalcDir4Turn2(mc.MO.DirV2, dirV2, TurnV * dt);
-        var dp = mc.MO.Velocity * dt;
+        var dd = MathEx.CalcDir4Turn2(mc.DirV2, dirV2, TurnV * dt);
+        var dp = mc.Velocity * dt;
 
         mc.PreTurnV = TurnV;
-        mc.PreDir = mc.MO.Dir + dd;
+        mc.PreDir = mc.Dir + dd;
 
-        var dx = MathEx.Cos(mc.MO.Dir + dd) * dp;
-        var dy = MathEx.Sin(mc.MO.Dir + dd) * dp;
-        mc.PrePos = mc.MO.Pos + new Vec2(dx, dy);
+        var dx = MathEx.Cos(mc.Dir + dd) * dp;
+        var dy = MathEx.Sin(mc.Dir + dd) * dp;
+        mc.PrePos = mc.Pos + new Vec2(dx, dy);
     }
 
     // 使用技能
