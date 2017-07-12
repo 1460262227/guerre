@@ -7,6 +7,7 @@ using System.Threading;
 using Swift;
 using Server;
 using Guerre;
+using Swift.Math;
 
 namespace Server
 {
@@ -97,11 +98,16 @@ namespace Server
             srv.Add("GameRoomMgr", grMgr);
 
             // add a test room
-            var tgr = grMgr.CreateNewRoom("test");
+            var gr = grMgr.CreateNewRoom("test");
+            var ig = new ItemGenerator();
+            ig.GenSpaceLeftTop = new Vec2(-7.5f, -5);
+            ig.GenSpaceSize = new Vec2(15, 10);
+            ig.MedicineDensity = 0.1f;
+            gr.IG = ig;
 
             var lgMgr = srv.Get<LoginManager>();
-            lgMgr.OnPlayerLogin += (p) => { tgr.AddPlayer(p); };
-            lgMgr.OnPlayerLogout += (p) => { tgr.RemovePlayer(p); };
+            lgMgr.OnPlayerLogin += (p) => { gr.AddPlayer(p); };
+            lgMgr.OnPlayerLogout += (p) => { gr.RemovePlayer(p); };
 
             // apis
             GRApis.SendMessageImpl = (id, op, fun) => { SendTo(sc, id, op, fun); };

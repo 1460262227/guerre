@@ -22,6 +22,9 @@ public class GameWorld : MonoBehaviour
     // 子弹模型
     public GameObject[] BulletModels = null;
 
+    // 道具
+    public GameObject[] Items = null;
+
     // 主摄像机
     public MainCamera MainCamera = null;
 
@@ -56,8 +59,10 @@ public class GameWorld : MonoBehaviour
             go = Instantiate(AirplaneModels[2].gameObject) as GameObject;
         else if (type == "Bullet")
             go = Instantiate(BulletModels[0].gameObject) as GameObject;
+        else if (type == "Medicine")
+            go = Instantiate(Items[0].gameObject) as GameObject;
         else
-            return;
+            throw new Exception("unknown object type: " + type);
 
         go.SetActive(true);
         go.transform.SetParent(SceneRoot, false);

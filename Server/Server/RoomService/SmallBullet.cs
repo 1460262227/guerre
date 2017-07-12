@@ -43,6 +43,9 @@ namespace Server
         // 碰撞
         public override bool CheckCollide(MovableObject obj)
         {
+            if (obj is Medicine)
+                return false;
+
             var d2 = (Pos - obj.Pos).Length2;
             return d2 < Radius2 + obj.Radius2;
         }

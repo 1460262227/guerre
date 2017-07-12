@@ -26,6 +26,9 @@ namespace Server
         // 房间 ID
         public string ID { get; private set; }
 
+        // 物品随机生成
+        public ItemGenerator IG = null;
+
         public GameRoom(string id)
         {
             ID = id;
@@ -125,6 +128,10 @@ namespace Server
                 op();
 
             ops.Clear();
+
+            // 物品生成
+            if (IG != null)
+                IG.RandomGen(FrameSec, (obj) => { AddObject(obj); });
 
             // 处理房间内物体逻辑
             ProcessAll(FrameSec);

@@ -26,12 +26,12 @@ namespace Server
             var p = new Vec2(Utils.RandomFloat(-3, 3), Utils.RandomFloat(-3, 3));
             Pos = p;
             p.Normalize();
-            Dir = -p.Dir();
+            Dir = p.Dir() + MathEx.Pi;
 
             switch (type)
             {
                 case 0:
-                    Velocity = 0.75f;
+                    Velocity = 1;
                     MaxTurnV = 0.75f;
                     gunShot = TripleShoot;
                     break;
@@ -65,7 +65,7 @@ namespace Server
             var b = new SmallBullet();
             b.ID = ID + "/bullet/" + BulletNum;
             b.OwnerID = ID;
-            b.Pos = Pos + DirV2 * 0.35f + DirV2.PerpendicularL * leftOffset;
+            b.Pos = Pos; // + DirV2 * 0.35f + DirV2.PerpendicularL * leftOffset;
             b.Dir = Dir;
             b.RangeLeft = 3;
             b.Velocity = 3;

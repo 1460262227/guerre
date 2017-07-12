@@ -109,6 +109,8 @@ namespace Server
         public virtual void Init()
         {
             Pos = Vec2.Zero;
+            Radius = 0.1f;
+            MaxHp = Hp = 1;
             Dir = MathEx.HalfPi;
             Turn2Dir = Vec2.Zero;
             TurnV = 0;
