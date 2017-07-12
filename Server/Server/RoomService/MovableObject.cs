@@ -28,6 +28,9 @@ namespace Server
         // 移动速率
         public Fix64 Velocity { get; set; }
 
+        // 最大角速度
+        public Fix64 MaxTurnV { get; set; }
+
         // 角速度
         public Fix64 TurnV { get; set; }
 

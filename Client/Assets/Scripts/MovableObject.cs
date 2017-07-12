@@ -16,6 +16,9 @@ public class MovableObject : MonoBehaviour
     // 移动速率
     public Fix64 Velocity { get; set; }
 
+    // 最大角速度
+    public Fix64 MaxTv { get; set; }
+
     // 角速度
     public virtual Fix64 TurnV
     {

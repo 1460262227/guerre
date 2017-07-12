@@ -45,7 +45,7 @@ namespace Server
                 end();
                 return true;
             }
-            else if (requestHandlersOnConnAsync.ContainsKey(op))
+            else if (requestHandlersOnSessionAsync.ContainsKey(op))
             {
                 requestHandlersOnSessionAsync[op](s, data, buff, end);
                 return true;

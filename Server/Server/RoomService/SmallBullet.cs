@@ -22,11 +22,11 @@ namespace Server
         {
             base.Init();
 
-            Velocity = 3;
+            Velocity = 1;
             Radius = 0.1f;
             Power = 1;
             MaxHp = Hp = 1;
-            RangeLeft = 3;
+            RangeLeft = 1;
         }
 
         // 沿当前方向移动一段距离

@@ -18,6 +18,7 @@ namespace Server
         public static int FrameMS = (int)(FrameSec * 1000);
 
         Dictionary<string, MovableObject> movableObjs = new Dictionary<string, MovableObject>();
+        List<Player> players = new List<Player>();
 
         // 房间 ID
         public string ID { get; private set; }
@@ -39,13 +40,10 @@ namespace Server
                     p.Room.RemovePlayer(p);
 
                 p.Room = this;
+                players.Add(p);
 
                 // 同步房间信息
                 SyncRoomStatus(p.ID);
-
-                var a = new Airplane();
-                a.ID = p.ID;
-                AddObject(a);
             });
         }
 
@@ -69,6 +67,7 @@ namespace Server
                 buff.Write(obj.Dir);
                 buff.Write(obj.Turn2Dir.x);
                 buff.Write(obj.Turn2Dir.y);
+                buff.Write(obj.MaxTurnV);
                 buff.Write(obj.TurnV);
                 buff.Write(obj.MaxHp);
                 buff.Write(obj.Hp);
@@ -94,11 +93,11 @@ namespace Server
         {
             ops.Add(() =>
             {
-                if (!movableObjs.ContainsKey(p.ID))
-                    return;
-
-                RemoveObject(p.ID);
+                players.Remove(p);
                 p.Room = null;
+
+                if (movableObjs.ContainsKey(p.ID))
+                    RemoveObject(p.ID);
             });
         }
 
@@ -206,6 +205,7 @@ namespace Server
                     buff.Write(obj.Dir);
                     buff.Write(obj.Turn2Dir.x);
                     buff.Write(obj.Turn2Dir.y);
+                    buff.Write(obj.MaxTurnV);
                     buff.Write(obj.TurnV);
                     buff.Write(obj.MaxHp);
                     buff.Write(obj.Hp);
@@ -217,8 +217,8 @@ namespace Server
         // 房间内广播消息
         void Boardcast(string op, Action<IWriteableBuffer> fun = null)
         {
-            foreach (var id in movableObjs.Keys)
-                GRApis.SendMessage(id, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );
+            foreach (var p in players)
+                GRApis.SendMessage(p.ID, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );
         }
 
         // 注册所有消息处理函数
@@ -253,6 +253,22 @@ namespace Server
 
                     var a = movableObjs[id] as Airplane;
                     a.UseSkill(skillName);
+                });
+            });
+
+            OnOp("Join", (Session s, IReadableBuffer data, IWriteableBuffer buff, Action end) =>
+            {
+                var id = s.ID;
+                var typeSel = data.ReadInt();
+                ops.Add(() =>
+                {
+                    var a = new Airplane();
+                    a.ID = id;
+                    a.BuildAttrs(typeSel);
+                    AddObject(a);
+
+                    buff.Write(true);
+                    end();
                 });
             });
         }
