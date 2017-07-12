@@ -38,5 +38,6 @@ public class PreservedInput : MonoBehaviour {
 
         curValue = input.text;
         PlayerPrefs.SetString(Key, curValue);
+        PlayerPrefs.Save();
     }
 }

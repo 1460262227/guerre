@@ -26,7 +26,7 @@ namespace Server
             var p = new Vec2(Utils.RandomFloat(-3, 3), Utils.RandomFloat(-3, 3));
             Pos = p;
             p.Normalize();
-            Dir = p.Dir();
+            Dir = -p.Dir();
 
             switch (type)
             {
