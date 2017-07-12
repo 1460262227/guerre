@@ -15,6 +15,9 @@ namespace Server
     {
         public override string Type => "Bullet";
 
+        // 谁发的子弹
+        public string OwnerID = null;
+
         // 剩余的射程
         public Fix64 RangeLeft = 0;
 

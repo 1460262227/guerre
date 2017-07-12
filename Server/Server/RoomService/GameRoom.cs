@@ -20,6 +20,9 @@ namespace Server
         Dictionary<string, MovableObject> movableObjs = new Dictionary<string, MovableObject>();
         List<Player> players = new List<Player>();
 
+        // 击杀统计
+        Dictionary<string, int> kills = new Dictionary<string, int>();
+
         // 房间 ID
         public string ID { get; private set; }
 
@@ -42,6 +45,9 @@ namespace Server
                 p.Room = this;
                 players.Add(p);
 
+                if (!kills.ContainsKey(p.ID))
+                    kills[p.ID] = 0;
+
                 // 同步房间信息
                 SyncRoomStatus(p.ID);
             });
@@ -53,8 +59,10 @@ namespace Server
             if (movableObjs.ContainsKey(obj.ID))
                 throw new Exception("object already exists in romm: " + obj.ID + " => " + ID);
 
+            var id = obj.ID;
+
             // 加入房间并广播消息
-            movableObjs[obj.ID] = obj;
+            movableObjs[id] = obj;
             obj.Room = this;
 
             Boardcast("AddIn", (buff) =>
@@ -153,6 +161,21 @@ namespace Server
                 obj.OnTimeElapsed(te);
         }
 
+        // 刷新击杀统计
+        void RefreshKillStatistics(string killer, string target)
+        {
+            var t = movableObjs[target] as Airplane;
+            if (t == null || t.Hp > 0)
+                return;
+
+            if (movableObjs[killer] is SmallBullet)
+                killer = (movableObjs[killer] as SmallBullet).OwnerID;
+
+            kills[killer]++;
+
+            Boardcast("Killing", (buff) => { buff.Write(killer); });
+        }
+
         // 处理碰撞
         void ProcessCollision()
         {
@@ -177,6 +200,9 @@ namespace Server
                             keys.Remove(k2);
                             keys.Remove(k1);
 
+                            RefreshKillStatistics(k1, k2);
+                            RefreshKillStatistics(k2, k1);
+
                             Boardcast("Collision", (buff) => { buff.Write(k1); buff.Write(k2); });
                         }
                     }, () => needCheck);
@@ -193,6 +219,8 @@ namespace Server
             GRApis.SendMessage(idTo, "SyncRoom", (buff) =>
             {
                 buff.Write(timeNumber);
+
+                // 房间内物体信息
                 buff.Write(movableObjs.Count);
                 foreach (var id in movableObjs.Keys)
                 {
@@ -210,6 +238,14 @@ namespace Server
                     buff.Write(obj.MaxHp);
                     buff.Write(obj.Hp);
                     buff.Write(obj.Power);
+                }
+
+                // 击杀信息
+                buff.Write(kills.Count);
+                foreach (var k in kills.Keys)
+                {
+                    buff.Write(k);
+                    buff.Write(kills[k]);
                 }
             });
         }
@@ -256,7 +292,7 @@ namespace Server
                 });
             });
 
-            OnOp("Join", (Session s, IReadableBuffer data, IWriteableBuffer buff, Action end) =>
+            OnOp("Join", (Session s, IReadableBuffer data) =>
             {
                 var id = s.ID;
                 var typeSel = data.ReadInt();
@@ -266,9 +302,6 @@ namespace Server
                     a.ID = id;
                     a.BuildAttrs(typeSel);
                     AddObject(a);
-
-                    buff.Write(true);
-                    end();
                 });
             });
         }

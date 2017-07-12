@@ -10,6 +10,11 @@ public class SelAirplaneUI : UIBase {
 
     int curSel = 0;
 
+    void Awake()
+    {
+        GameCore.Instance.OnIn += Hide;
+    }
+
     private void Start()
     {
         curSel = 0;
@@ -29,14 +34,7 @@ public class SelAirplaneUI : UIBase {
 
     public void JoinGame()
     {
-        APIs.Request("GameRoom/test", "Join", (buff) => { buff.Write(curSel); }, (data) =>
-        {
-            var ok = data.ReadBool();
-            if (ok)
-                Hide();
-        }, (connected) =>
-        {
-            Debug.LogWarning("network timeout");
-        });
+        GameCore.Instance.CurSelAirplane = curSel;
+        APIs.Send("GameRoom/test", "Join", (buff) => { buff.Write(curSel); });
     }
 }

@@ -8,7 +8,6 @@ using Swift.Math;
 public class Tester : MonoBehaviour {
 
     public GameObject LoginUIObj = null;
-    public GameObject SelAirplaneUIObj = null;
     public ControlHandler CH = null;
     public GameWorld GW = null;
     public Joystick JS = null;
@@ -16,12 +15,11 @@ public class Tester : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         LoginUIObj.SetActive(false);
-        SelAirplaneUIObj.SetActive(false);
         CH.enabled = false;
         var me = new PlayerInfo();
         me.ID = "me";
         GameCore.Instance.Me = me;
-        GW.Add(0, me.ID, "Airplane0", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 1, 0, 10, 10, 10);
+        GW.Add(0, me.ID, "Airplane/0", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 1, 0, 10, 10, 10);
         StartCoroutine(PushTime(1));
     }
 

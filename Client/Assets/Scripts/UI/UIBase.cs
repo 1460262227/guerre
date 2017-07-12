@@ -7,7 +7,12 @@ public class UIBase : MonoBehaviour
     // 每次打开界面前初始化
     public virtual void Init() { }
 
-	public void Hide()
+    public virtual void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
+	public virtual void Hide()
     {
         gameObject.SetActive(false);
     }

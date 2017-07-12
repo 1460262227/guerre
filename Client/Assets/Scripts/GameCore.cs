@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using Swift;
 using Guerre;
+using System;
 
 /// <summary>
 /// 客户端游戏核心对象，引用所有逻辑模块并负责主要驱动
@@ -64,4 +65,14 @@ public class GameCore : Core
 
     public PlayerInfo Me = null;
     public MovableObject MeObj = null;
+    public int CurSelAirplane = 0;
+
+    // 加入房间和移出房间
+    public Action RoomSynchonizing = null;
+    public Action OnIn = null;
+    public Action OnOut = null;
+
+    // 击杀统计
+    public Action<string, int> OnKill = null;
+    public int MyKills = 0; // 击杀统计
 }

@@ -48,11 +48,11 @@ public class GameWorld : MonoBehaviour
         // 添加模型
         GameObject go = null;
 
-        if (type == "Airplane_0")
+        if (type == "Airplane/0")
             go = Instantiate(AirplaneModels[0].gameObject) as GameObject;
-        else if (type == "Airplane_1")
+        else if (type == "Airplane/1")
             go = Instantiate(AirplaneModels[1].gameObject) as GameObject;
-        else if (type == "Airplane_2")
+        else if (type == "Airplane/2")
             go = Instantiate(AirplaneModels[2].gameObject) as GameObject;
         else if (type == "Bullet")
             go = Instantiate(BulletModels[0].gameObject) as GameObject;
@@ -77,15 +77,18 @@ public class GameWorld : MonoBehaviour
         a.UpdateImmediately();
         movingObjs[id] = a;
 
-        if (GameCore.Instance.Me.ID == id)
+        // 自己进入房间
+        var gc = GameCore.Instance;
+        if (gc.Me.ID == id)
         {
             MainCamera.Target = a.transform;
-            GameCore.Instance.MeObj = a;
+            gc.MeObj = a;
+            gc.OnIn.SC();
         }
     }
 
-    // 移除一架飞机
-    public void DelAirplane(string id)
+    // 移除物体
+    public void DelObject(string id)
     {
         if (!movingObjs.ContainsKey(id))
             throw new Exception("airplane id not exists: " + id);
@@ -96,6 +99,14 @@ public class GameWorld : MonoBehaviour
         var go = a.gameObject;
         go.transform.SetParent(null);
         Destroy(go);
+
+        // 自己被移出房间
+        if (GameCore.Instance.Me.ID == id)
+        {
+            MainCamera.Target = null;
+            GameCore.Instance.MeObj = null;
+            GameCore.Instance.OnOut.SC();
+        }
     }
 
     // 等待执行的指令列表
@@ -188,7 +199,7 @@ public class GameWorld : MonoBehaviour
     public void Del(int t, string id)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { DelAirplane(id); });
+        cmds.Add(() => { DelObject(id); });
     }
 
     // 给定时间编号开始，到一定时间编号长度内，空指令
@@ -251,7 +262,7 @@ public class GameWorld : MonoBehaviour
             var obj1 = movingObjs[id1];
             var obj2 = movingObjs[id2];
             obj1.Hp -= obj2.Power;
-            obj2.Power -= obj1.Power;
+            obj2.Hp -= obj1.Power;
         });
     }
 
@@ -301,7 +312,18 @@ public class GameWorld : MonoBehaviour
                 powers[i] = data.ReadFix64();
             });
 
+            // 正在同步房间信息
+            GameCore.Instance.RoomSynchonizing.SC();
             SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, maxTVs, turnVs, maxHps, hps, powers);
+
+            // 击杀信息
+            int killCnt = data.ReadInt();
+            FC.For(killCnt, (i) =>
+            {
+                var k = data.ReadString();
+                var n = data.ReadInt();
+                GameCore.Instance.OnKill(k, n);
+            });
         });
 
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
@@ -334,6 +356,11 @@ public class GameWorld : MonoBehaviour
             var k1 = data.ReadString();
             var k2 = data.ReadString();
             Collision(t, k1, k2);
+        });
+        OnOp("Killing", (t, data) =>
+        {
+            var killer = data.ReadString();
+            GameCore.Instance.OnKill(killer, 1);
         });
     }
 }

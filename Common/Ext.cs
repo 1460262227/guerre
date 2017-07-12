@@ -44,5 +44,11 @@ namespace Swift
             if (act != null)
                 act(p1, p2, t3, t4, t5);
         }
+
+        public static KeyType[] SortKeysByValues<KeyType, ValueType>(this Dictionary<KeyType, ValueType> dict, bool ascending)
+        {
+            var keys = dict.Keys.ToArray();
+            return ascending ? keys.OrderBy((k) => dict[k]).ToArray() : keys.OrderByDescending((k) => dict[k]).ToArray();
+        }
     }
 }

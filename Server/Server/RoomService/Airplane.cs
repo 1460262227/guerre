@@ -15,7 +15,7 @@ namespace Server
         uint BulletNum = 0;
         Action gunShot = null;
 
-        string airplaneType = "Airplane_";
+        string airplaneType = "Airplane/";
         public void BuildAttrs(int type)
         {
             MaxHp = 10;
@@ -23,13 +23,17 @@ namespace Server
             Power = 10;
             Radius = 0.3f;
             airplaneType += type;
+            var p = new Vec2(Utils.RandomFloat(-3, 3), Utils.RandomFloat(-3, 3));
+            Pos = p;
+            p.Normalize();
+            Dir = p.Dir();
 
             switch (type)
             {
                 case 0:
-                    Velocity = 1;
+                    Velocity = 0.75f;
                     MaxTurnV = 0.75f;
-                    gunShot = DoubleShot;
+                    gunShot = TripleShoot;
                     break;
                 case 1:
                     Velocity = 1.25f;
@@ -57,9 +61,10 @@ namespace Server
         // 机枪射击
         SmallBullet MakeBullet(float leftOffset)
         {
-            var b = new SmallBullet();
             BulletNum++;
-            b.ID = ID + "/bullet_" + BulletNum;
+            var b = new SmallBullet();
+            b.ID = ID + "/bullet/" + BulletNum;
+            b.OwnerID = ID;
             b.Pos = Pos + DirV2 * 0.35f + DirV2.PerpendicularL * leftOffset;
             b.Dir = Dir;
             b.RangeLeft = 3;
@@ -77,10 +82,15 @@ namespace Server
         
 
         // 双发
-        void DoubleShot()
+        void TripleShoot()
         {
+            var b0 = MakeBullet(0);
             var b1 = MakeBullet(0.2f);
             var b2 = MakeBullet(-0.2f);
+            b0.Dir = Dir;
+            b2.Dir = (DirV2 - DirV2.PerpendicularL * 0.1f).Dir();
+            b1.Dir = (DirV2 + DirV2.PerpendicularL * 0.1f).Dir();
+            Room.AddObject(b0);
             Room.AddObject(b1);
             Room.AddObject(b2);
         }
