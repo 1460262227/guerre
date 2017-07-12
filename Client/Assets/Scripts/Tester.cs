@@ -19,7 +19,18 @@ public class Tester : MonoBehaviour {
         var me = new PlayerInfo();
         me.ID = "me";
         GameCore.Instance.Me = me;
-        GW.Add(0, me.ID, "Airplane/0", Vec2.Zero, 1f, MathEx.Up, Vec2.Zero, 1, 0, 10, 10, 10);
+
+        var a = new MovableObjectInfo();
+        a.ID = me.ID;
+        a.Type = "Airplane/0";
+        a.Pos = Vec2.Zero;
+        a.Velocity = 1;
+        a.MaxTurnV = 1;
+        a.Dir = MathEx.Up;
+        a.Turn2Dir = Vec2.Zero;
+        a.Hp = a.MaxHp = 10;
+        GW.Add(0, a);
+
         StartCoroutine(PushTime(1));
     }
 

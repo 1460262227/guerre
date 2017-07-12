@@ -10,19 +10,21 @@ namespace Server
     // 飞机
     public class Airplane : MovableObject
     {
-        public override string Type => airplaneType;
-
         uint BulletNum = 0;
         Action gunShot = null;
 
-        string airplaneType = "Airplane/";
+        public override void Init()
+        {
+            base.Init();
+        }
+
         public void BuildAttrs(int type)
         {
             MaxHp = 10;
             Hp = 10;
             Power = 10;
             Radius = 0.3f;
-            airplaneType += type;
+            Type = "Airplane/" + type;
             var p = new Vec2(Utils.RandomFloat(-3, 3), Utils.RandomFloat(-3, 3));
             Pos = p;
             p.Normalize();
@@ -80,7 +82,6 @@ namespace Server
             Room.AddObject(b);
         }
         
-
         // 双发
         void TripleShoot()
         {

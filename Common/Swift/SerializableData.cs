@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using Swift.Math;
 
 namespace Swift
 {
@@ -147,6 +148,43 @@ namespace Swift
                     for (int i = 0; i < count; i++)
                         v.Add(r.ReadInt());
                 }
+            }
+        }
+        protected void SyncFix64(ref Fix64 v)
+        {
+            MakeSureSyncing();
+
+            if (isWrite)
+                w.Write(v.RawValue);
+            else
+            {
+                if (IsEnd())
+                {
+                    // 不修改v
+                    return;
+                }
+                v = Fix64.FromRaw(r.ReadLong());
+            }
+        }
+        protected void SyncVec2(ref Vec2 v)
+        {
+            MakeSureSyncing();
+
+            if (isWrite)
+            {
+                w.Write(v.x);
+                w.Write(v.y);
+            }
+            else
+            {
+                if (IsEnd())
+                {
+                    // 不修改v
+                    return;
+                }
+                var x = Fix64.FromRaw(r.ReadLong());
+                var y = Fix64.FromRaw(r.ReadLong());
+                v = new Vec2(x, y);
             }
         }
         protected void SyncLong(ref long v)

@@ -70,19 +70,7 @@ namespace Server
 
             Boardcast("AddIn", (buff) =>
             {
-                buff.Write(obj.ID);
-                buff.Write(obj.Type);
-                buff.Write(obj.Pos.x);
-                buff.Write(obj.Pos.y);
-                buff.Write(obj.Velocity);
-                buff.Write(obj.Dir);
-                buff.Write(obj.Turn2Dir.x);
-                buff.Write(obj.Turn2Dir.y);
-                buff.Write(obj.MaxTurnV);
-                buff.Write(obj.TurnV);
-                buff.Write(obj.MaxHp);
-                buff.Write(obj.Hp);
-                buff.Write(obj.Power);
+                obj.Serialize(buff);
             });
         }
 
@@ -145,7 +133,7 @@ namespace Server
             ProcessCollision();
 
             // 最后做移除操作
-            var toBeRemoved = new List<MovableObject>();
+            var toBeRemoved = new List<MovableObjectInfo>();
             foreach (var k in movableObjs.Keys.ToArray())
             {
                 var obj = movableObjs[k];
@@ -201,7 +189,7 @@ namespace Server
                     {
                         var k2 = keys[j];
                         var obj2 = movableObjs[k2];
-                        if(obj1.DoCollide(obj2))
+                        if (Collider.DoCollision(/* obj1, obj2 */))
                         {
                             needCheck = true;
                             keys.Remove(k2);
@@ -232,19 +220,7 @@ namespace Server
                 foreach (var id in movableObjs.Keys)
                 {
                     var obj = movableObjs[id];
-                    buff.Write(obj.ID);
-                    buff.Write(obj.Type);
-                    buff.Write(obj.Pos.x);
-                    buff.Write(obj.Pos.y);
-                    buff.Write(obj.Velocity);
-                    buff.Write(obj.Dir);
-                    buff.Write(obj.Turn2Dir.x);
-                    buff.Write(obj.Turn2Dir.y);
-                    buff.Write(obj.MaxTurnV);
-                    buff.Write(obj.TurnV);
-                    buff.Write(obj.MaxHp);
-                    buff.Write(obj.Hp);
-                    buff.Write(obj.Power);
+                    obj.Serialize(buff);
                 }
 
                 // 击杀信息

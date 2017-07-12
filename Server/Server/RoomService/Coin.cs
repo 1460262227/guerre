@@ -10,15 +10,15 @@ using Guerre;
 namespace Server
 {
     /// <summary>
-    /// 医药箱
+    /// 金币
     /// </summary>
-    public class Medicine : MovableObject
+    public class Coin : MovableObject
     {
         public override void Init()
         {
             base.Init();
             Radius = 0.15f;
-            Type = "Medicine";
+            Type = "Coin";
         }
     }
 }

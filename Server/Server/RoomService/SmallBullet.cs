@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Swift;
 using Swift.Math;
+using Guerre;
 
 namespace Server
 {
@@ -13,8 +14,6 @@ namespace Server
     /// </summary>
     public class SmallBullet : MovableObject
     {
-        public override string Type => "Bullet";
-
         // 谁发的子弹
         public string OwnerID = null;
 
@@ -30,6 +29,7 @@ namespace Server
             Power = 1;
             MaxHp = Hp = 1;
             RangeLeft = 1;
+            Type = "SmallBullet";
         }
 
         // 沿当前方向移动一段距离
@@ -38,16 +38,6 @@ namespace Server
             var d = MoveForward(te);
             RangeLeft -= d;
             ToBeRemoved = ToBeRemoved || RangeLeft <= 0;
-        }
-
-        // 碰撞
-        public override bool CheckCollide(MovableObject obj)
-        {
-            if (obj is Medicine)
-                return false;
-
-            var d2 = (Pos - obj.Pos).Length2;
-            return d2 < Radius2 + obj.Radius2;
         }
     }
 }

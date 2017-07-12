@@ -102,7 +102,9 @@ namespace Server
             var ig = new ItemGenerator();
             ig.GenSpaceLeftTop = new Vec2(-7.5f, -5);
             ig.GenSpaceSize = new Vec2(15, 10);
-            ig.MedicineDensity = 0.1f;
+            ig.MedicineDensity = 0.05f;
+            ig.CoinDensity = 0.1f;
+            ig.LightningDensity = 0.05f;
             gr.IG = ig;
 
             var lgMgr = srv.Get<LoginManager>();

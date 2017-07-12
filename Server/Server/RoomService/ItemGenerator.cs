@@ -17,23 +17,37 @@ namespace Server
         public Vec2 GenSpaceLeftTop;
         public Vec2 GenSpaceSize;
 
-        // 医药箱每秒生成密度
-        public float MedicineDensity;
+        // 每秒生成密度
+        public float MedicineDensity; // 医药箱
+        public float CoinDensity; // 金币
+        public float LightningDensity; // 闪电
 
         int items = 0;
+
+        Dictionary<Func<MovableObject>, float> gens = new Dictionary<Func<MovableObject>, float>();
+
+        public ItemGenerator()
+        {
+            gens[() => new Medicine()] = MedicineDensity;
+            gens[() => new Coin()] = CoinDensity;
+            gens[() => new Lightning()] = LightningDensity;
+        }
 
         // 随机生成物品
         public void RandomGen(Fix64 te, Action<MovableObject> cb)
         {
-            // 医药箱
-            if (Utils.RandomHit((float)te * MedicineDensity))
+            foreach (var g in gens.Keys)
             {
-                items++;
-                var m = new Medicine();
-                m.ID = "Medicine/" + items;
-                m.Pos = GenSpaceLeftTop + Utils.RandomVec2(GenSpaceSize);
-                m.Dir = 0;
-                cb(m);
+                float r = gens[g] * (float)te;
+                if (Utils.RandomHit(r))
+                {
+                    items++;
+                    var obj = g();
+                    obj.ID = "Lightning/" + items;
+                    obj.Pos = GenSpaceLeftTop + Utils.RandomVec2(GenSpaceSize);
+                    obj.Dir = 0;
+                    cb(obj);
+                }
             }
         }
     }

@@ -32,7 +32,7 @@ public class GameWorld : MonoBehaviour
     public Vector2 WorldSize = new Vector2(10, 10);
 
     // 当前世界移动物体
-    Dictionary<string, MovableObject> movingObjs = new Dictionary<string, MovableObject>();
+    Dictionary<string, MovableObjectController> movingObjControllers = new Dictionary<string, MovableObjectController>();
 
     // 客户端的游戏世界时间流失
     int timeElapsed = 0;
@@ -43,9 +43,12 @@ public class GameWorld : MonoBehaviour
     }
 
     // 添加一个物体
-    public void AddObject(string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 maxTv, Fix64 turnV, Fix64 maxHp, Fix64 hp, Fix64 power)
+    public void AddObject(MovableObjectInfo obj)
     {
-        if (movingObjs.ContainsKey(id))
+        var id = obj.ID;
+        var type = obj.Type;
+
+        if (movingObjControllers.ContainsKey(id))
             throw new Exception("object id conflicted: " + id);
 
         // 添加模型
@@ -61,6 +64,10 @@ public class GameWorld : MonoBehaviour
             go = Instantiate(BulletModels[0].gameObject) as GameObject;
         else if (type == "Medicine")
             go = Instantiate(Items[0].gameObject) as GameObject;
+        else if (type == "Coin")
+            go = Instantiate(Items[1].gameObject) as GameObject;
+        else if (type == "Lightning")
+            go = Instantiate(Items[2].gameObject) as GameObject;
         else
             throw new Exception("unknown object type: " + type);
 
@@ -68,26 +75,17 @@ public class GameWorld : MonoBehaviour
         go.transform.SetParent(SceneRoot, false);
 
         // 设置属性
-        var a = go.GetComponent<MovableObject>();
-        a.ID = id;
-        a.Pos = pos;
-        a.Dir = dir;
-        a.Velocity = velocity;
-        a.Turn2Dir = dirTo;
-        a.MaxTv = maxTv;
-        a.TurnV = turnV;
-        a.MaxHp = maxHp;
-        a.Hp = hp;
-        a.Power = power;
-        a.UpdateImmediately();
-        movingObjs[id] = a;
+        var oc = go.GetComponent<MovableObjectController>();
+        oc.MO = obj;
+        oc.UpdateImmediately();
+        movingObjControllers[id] = oc;
 
         // 自己进入房间
         var gc = GameCore.Instance;
         if (gc.Me.ID == id)
         {
-            MainCamera.Target = a.transform;
-            gc.MeObj = a;
+            MainCamera.Target = oc.transform;
+            gc.MeOC = oc;
             gc.OnIn.SC();
         }
     }
@@ -95,11 +93,11 @@ public class GameWorld : MonoBehaviour
     // 移除物体
     public void DelObject(string id)
     {
-        if (!movingObjs.ContainsKey(id))
+        if (!movingObjControllers.ContainsKey(id))
             throw new Exception("airplane id not exists: " + id);
 
-        var a = movingObjs[id];
-        movingObjs.Remove(id);
+        var a = movingObjControllers[id];
+        movingObjControllers.Remove(id);
 
         var go = a.gameObject;
         go.transform.SetParent(null);
@@ -109,7 +107,7 @@ public class GameWorld : MonoBehaviour
         if (GameCore.Instance.Me.ID == id)
         {
             MainCamera.Target = null;
-            GameCore.Instance.MeObj = null;
+            GameCore.Instance.MeOC = null;
             GameCore.Instance.OnOut.SC();
         }
     }
@@ -140,7 +138,7 @@ public class GameWorld : MonoBehaviour
         te *= timeTime;
 
         // 推动物体平滑表现
-        foreach (var mo in movingObjs.Values)
+        foreach (var mo in movingObjControllers.Values)
             mo.UpdateSmoothly((float)te);
 
         timeElapsed += (int)(te * 1000);
@@ -149,14 +147,14 @@ public class GameWorld : MonoBehaviour
         while (commanders.Count > curCmdIndex + 1 && timeElapsed >= FrameMS)
         {
             // 推动物体平滑表现
-            foreach (var mo in movingObjs.Values)
+            foreach (var mo in movingObjControllers.Values)
                 mo.UpdateSmoothly(FrameSec);
 
             // 处理指令
             ProcessCommands();
 
             // 推动物体逻辑
-            foreach (var mo in movingObjs.Values)
+            foreach (var mo in movingObjControllers.Values)
                 mo.MoveForward(FrameSec);
 
             // 打印调试信息
@@ -188,16 +186,16 @@ public class GameWorld : MonoBehaviour
     }
 
     // 获取制定 ID 的物体
-    public MovableObject GetByID(string id)
+    public MovableObjectController GetByID(string id)
     {
-        return movingObjs[id] as MovableObject;
+        return movingObjControllers[id] as MovableObjectController;
     }
 
     // 增加飞机
-    public void Add(int t, string id, string type, Vec2 pos, Fix64 velocity, Fix64 dir, Vec2 dirTo, Fix64 maxTv, Fix64 tv, Fix64 maxHp, Fix64 hp, Fix64 power)
+    public void Add(int t, MovableObjectInfo obj)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { AddObject(id, type, pos, velocity, dir, dirTo, maxTv, tv, maxHp, hp, power); });
+        cmds.Add(() => { AddObject(obj); });
     }
 
     // 移除飞机
@@ -214,7 +212,7 @@ public class GameWorld : MonoBehaviour
     }
 
     // 同步房间状态
-    public void SyncRoomStatus(int t, string[] ids, string[] types, Vec2[] poses, Fix64[] vs, Fix64[] dirs, Vec2[] dirTos, Fix64[] maxTurnVs, Fix64[] turnVs, Fix64[] maxHps, Fix64[] hps, Fix64[] powers)
+    public void SyncRoomStatus(int t, MovableObjectInfo[] objs)
     {
         timeNumBase = t;
         commanders.Clear();
@@ -222,20 +220,9 @@ public class GameWorld : MonoBehaviour
         // 插入一条哑指令作为起始
         Dumb(0);
 
-        FC.For(ids.Length, (i) =>
+        FC.For(objs.Length, (i) =>
         {
-            var id = ids[i];
-            var type = types[i];
-            var pos = poses[i];
-            var v = vs[i];
-            var dir = dirs[i];
-            var dirTo = dirTos[i];
-            var maxTv = maxTurnVs[i];
-            var tv = turnVs[i];
-            var maxHp = maxHps[i];
-            var hp = hps[i];
-            var power = powers[i];
-            Add(0, id, type, pos, v, dir, dirTo, maxTv, tv, maxHp, hp, power);
+            Add(0, objs[i]);
         });
     }
 
@@ -243,7 +230,7 @@ public class GameWorld : MonoBehaviour
     public void SetDir(int t, string id, Fix64 dir)
     {
         var cmds = RetrieveCmds(t);
-        cmds.Add(() => { var mo = movingObjs[id]; mo.Dir = dir; });
+        cmds.Add(() => { var mc = movingObjControllers[id]; mc.MO.Dir = dir; });
     }
 
     // 设置飞机转向指定方向
@@ -252,9 +239,9 @@ public class GameWorld : MonoBehaviour
         var cmds = RetrieveCmds(t);
         cmds.Add(() =>
         {
-            var mo = movingObjs[id];
-            mo.Turn2Dir = toDir;
-            mo.TurnV = tv;
+            var mo = movingObjControllers[id];
+            mo.MO.Turn2Dir = toDir;
+            mo.MO.TurnV = tv;
         });
     }
 
@@ -264,10 +251,9 @@ public class GameWorld : MonoBehaviour
         var cmds = RetrieveCmds(t);
         cmds.Add(() =>
         {
-            var obj1 = movingObjs[id1];
-            var obj2 = movingObjs[id2];
-            obj1.Hp -= obj2.Power;
-            obj2.Hp -= obj1.Power;
+            var obj1 = movingObjControllers[id1];
+            var obj2 = movingObjControllers[id2];
+            Guerre.Collider.DoCollision(/* obj1, obj2 */);
         });
     }
 
@@ -291,35 +277,15 @@ public class GameWorld : MonoBehaviour
         {
             var t = data.ReadInt();
             var cnt = data.ReadInt();
-            var ids = new string[cnt];
-            var types = new string[cnt];
-            var poses = new Vec2[cnt];
-            var vs = new Fix64[cnt];
-            var dirs = new Fix64[cnt];
-            var dirTos = new Vec2[cnt];
-            var maxTVs = new Fix64[cnt];
-            var turnVs = new Fix64[cnt];
-            var maxHps = new Fix64[cnt];
-            var hps = new Fix64[cnt];
-            var powers = new Fix64[cnt];
+            var objs = new MovableObjectInfo[cnt];
             FC.For(cnt, (i) =>
             {
-                ids[i] = data.ReadString();
-                types[i] = data.ReadString();
-                poses[i] = new Vec2(data.ReadFix64(), data.ReadFix64());
-                vs[i] = data.ReadFix64();
-                dirs[i] = data.ReadFix64();
-                dirTos[i] = new Vec2(data.ReadFix64(), data.ReadFix64());
-                maxTVs[i] = data.ReadFix64();
-                turnVs[i] = data.ReadFix64();
-                maxHps[i] = data.ReadFix64();
-                hps[i] = data.ReadFix64();
-                powers[i] = data.ReadFix64();
+                objs[i].Deserialize(data);
             });
 
             // 正在同步房间信息
             GameCore.Instance.RoomSynchonizing.SC();
-            SyncRoomStatus(t, ids, types, poses, vs, dirs, dirTos, maxTVs, turnVs, maxHps, hps, powers);
+            SyncRoomStatus(t, objs);
 
             // 击杀信息
             int killCnt = data.ReadInt();
@@ -334,19 +300,10 @@ public class GameWorld : MonoBehaviour
         OnOp("GameTimeFowardStep", (t, data) => { Dumb(t); });
         OnOp("AddIn", (t, data) =>
         {
-            var id = data.ReadString();
-            var type = data.ReadString();
-            var pos = new Vec2(data.ReadFix64(), data.ReadFix64());
-            var v = data.ReadFix64();
-            var dir = data.ReadFix64();
-            var dirTo = new Vec2(data.ReadFix64(), data.ReadFix64());
-            var maxTv = data.ReadFix64();
-            var tv = data.ReadFix64();
-            var maxHp = data.ReadFix64();
-            var hp = data.ReadFix64();
-            var power = data.ReadFix64();
+            var obj = new MovableObjectInfo();
+            obj.Deserialize(data);
 
-            Add(t, id, type, pos, v, dir, dirTo, maxTv, tv, maxHp, hp, power);
+            Add(t, obj);
         });
         OnOp("RemoveOut", (t, data) => { var id = data.ReadString(); Del(t, id);});
         OnOp("Turn2", (t, data) =>

@@ -64,7 +64,7 @@ public class GameCore : Core
     }
 
     public PlayerInfo Me = null;
-    public MovableObject MeObj = null;
+    public MovableObjectController MeOC = null;
     public int CurSelAirplane = 0;
 
     // 加入房间和移出房间

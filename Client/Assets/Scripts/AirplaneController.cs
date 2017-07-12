@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// 飞机表现控制
 /// </summary>
-public class Airplane : MovableObject
+public class AirplaneController : MovableObjectController
 {
     // 血条
     public Transform BloodBar;
@@ -17,22 +17,10 @@ public class Airplane : MovableObject
     // 机身特殊效果
     public AirplaneSprite AS;
 
-    public override Fix64 Hp
-    {
-        get { return base.Hp; }
-        set
-        {
-            base.Hp = value;
-            var div = (float)(Hp / MaxHp);
-            BloodBar.localScale = new Vector3(div, 1, 1);
-            BloodBar.localPosition = new Vector3(-(1 - div)/4, 0, 0);
-        }
-    }
-
     private void LateUpdate()
     {
-        var turn2Dir = TurnV == 0 ? Dir : Turn2Dir.Dir();
-        var nowDir = Dir;
+        var turn2Dir = MO.TurnV == 0 ? MO.Dir : MO.Turn2Dir.Dir();
+        var nowDir = MO.Dir;
         var da = (turn2Dir - nowDir).RangeInPi().Clamp(-1, 1);
         AS.TurnAngle = ((float)(da / MathEx.Pi) + AS.TurnAngle * 4) / 5;
     }

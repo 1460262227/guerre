@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Collider.cs" />
     <Compile Include="Common\Swift\Math\Fixed64.cs" />
     <Compile Include="Common\Swift\Math\FixedSinLut.cs" />
     <Compile Include="Common\Swift\Math\FixedTanLut.cs" />
@@ -78,11 +79,14 @@
     <Compile Include="Common\Swift\Net\MessageHandler.cs" />
     <Compile Include="Login\LoginManager.cs" />
     <Compile Include="Log\ServerLogger.cs" />
+    <Compile Include="RoomService\Coin.cs" />
     <Compile Include="RoomService\ItemGenerator.cs" />
+    <Compile Include="RoomService\Lightning.cs" />
     <Compile Include="RoomService\Medicine.cs" />
+    <Compile Include="RoomService\MovableObject.cs" />
     <Compile Include="RoomService\SmallBullet.cs" />
     <Compile Include="RoomService\GRApis.cs" />
-    <Compile Include="RoomService\MovableObject.cs" />
+    <Compile Include="Common\MovableObjectInfo.cs" />
     <Compile Include="ServerMessageHandlers.cs" />
     <Compile Include="Player\Player.cs" />
     <Compile Include="Player\PlayerContainer.cs" />
