@@ -35,7 +35,10 @@ public class StatisticsUI : MonoBehaviour {
             Ranks[i].text = keys.Length > i ? Kills[keys[i]] + ": " + keys[i] : "";
         });
 
-        gc.MyKills = Kills.ContainsKey(gc.Me.ID) ? Kills[gc.Me.ID] : 0;
-        MyKills.text = gc.MyKills.ToString();
+        if (killer == gc.Me.ID)
+        {
+            gc.MyKills += n;
+            MyKills.text = gc.MyKills.ToString();
+        }
     }
 }

@@ -86,6 +86,7 @@ public class GameWorld : MonoBehaviour
         {
             MainCamera.Target = oc.transform;
             gc.MeOC = oc;
+            gc.MyKills = 0;
             gc.OnIn.SC();
         }
     }
@@ -154,7 +155,7 @@ public class GameWorld : MonoBehaviour
             ProcessCommands();
 
             // 打印调试信息
-            // Debug.Log("== t == " + (curCmdIndex + timeNumBase));
+            //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
 
             // 推动物体逻辑
             foreach (var mc in movingObjControllers.Values)
@@ -167,7 +168,7 @@ public class GameWorld : MonoBehaviour
                 mc.ProcessMove(FrameSec);
 
                 //if (mc.MO.CollisionType == "Airplane")
-                //    Debug.Log(" " + mc.ID + ": (" + mc.Pos.x + ", " + mc.Pos.y + ") : " + mc.Dir);
+                //  Debug.Log(" " + mc.ID + ": (" + mc.Pos.x + ", " + mc.Pos.y + ") : " + mc.Dir);
             }
 
             timeElapsed -= FrameMS;
@@ -358,7 +359,19 @@ public class GameWorld : MonoBehaviour
                 obj.MaxTurnV /= 2;
                 obj.Turn2Dir /= 2;
                 obj.Powering = false;
-                Debug.Log("Power Down");
+                // Debug.Log("Power Down");
+            });
+        });
+        OnOp("Jump", (t, data) =>
+        {
+            var id = data.ReadString();
+            var cmds = RetrieveCmds(t);
+            cmds.Add(() =>
+            {
+                var obj = movingObjControllers[id];
+                obj.MoveForwardOnDir(MathEx.Sqrt(obj.Mp));
+                obj.Mp = 0;
+                obj.UpdateImmediately();
             });
         });
     }

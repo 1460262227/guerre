@@ -98,5 +98,10 @@ namespace Swift.Math
         {
             return Fix64.Atan2(y, x);
         }
+
+        public static Fix64 Sqrt(Fix64 v)
+        {
+            return Fix64.Sqrt(v);
+        }
     }
 }

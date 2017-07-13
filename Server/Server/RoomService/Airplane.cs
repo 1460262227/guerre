@@ -49,6 +49,7 @@ namespace Server
                     Velocity = 1.25f;
                     MaxTurnV = 1.25f;
                     gunShot = Shot;
+                    powerUp = Jump;
                     break;
                 case 2:
                     Velocity = 1;
@@ -77,6 +78,8 @@ namespace Server
             if (powering && Mp <= 0)
                 powerDown();
         }
+
+        #region 射击
 
         // 机枪射击
         SmallBullet MakeBullet(float leftOffset)
@@ -120,6 +123,10 @@ namespace Server
             Room.AddObject(b);
         }
 
+        #endregion
+
+        #region 特殊技
+
         // 加速
         void SpeedUp()
         {
@@ -138,7 +145,18 @@ namespace Server
             MaxTurnV /= 2;
             TurnV /= 2;
             Room.Boardcast("SpeedDown", (buff) => { buff.Write(ID); });
-            Console.WriteLine("Power Down");
+            // Console.WriteLine("Power Down");
         }
+
+        // 跳跃
+        void Jump()
+        {
+            var dist = MathEx.Sqrt(Mp);
+            MoveForwardOnDir(dist);
+            Mp = 0;
+            Room.Boardcast("Jump", (buff) => { buff.Write(ID); });
+        }
+
+        #endregion
     }
 }

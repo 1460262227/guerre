@@ -148,7 +148,7 @@ namespace Server
         void ProcessAll(Fix64 te)
         {
             // 打印调试信息
-            // Console.WriteLine("== t == " + timeNumber);
+            //Console.WriteLine("== t == " + timeNumber);
 
             foreach (var obj in movableObjs.Values)
             {
@@ -160,7 +160,7 @@ namespace Server
                 obj.ProcessMove(te);
 
                 //if (obj.CollisionType == "Airplane")
-                //    Console.WriteLine(" " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+                //  Console.WriteLine(" " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
             }
         }
 

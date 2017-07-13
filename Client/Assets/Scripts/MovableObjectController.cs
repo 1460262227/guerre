@@ -168,4 +168,13 @@ public class MovableObjectController : MonoBehaviour
         TurnV = MO.TurnV;
         shirfting = true;
     }
+
+    public void MoveForwardOnDir(Fix64 dist)
+    {
+        MO.MoveForwardOnDir(dist);
+        Pos = MO.Pos;
+        Dir = MO.Dir;
+        TurnV = MO.TurnV;
+        shirfting = true;
+    }
 }
