@@ -202,6 +202,9 @@ namespace Guerre
 
         public void SpeedUp()
         {
+            if (Mp <= 0)
+                return;
+
             Speeding = Mp;
             Velocity *= 2;
             MaxTurnV *= 2;

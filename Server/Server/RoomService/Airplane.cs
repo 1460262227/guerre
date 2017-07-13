@@ -38,14 +38,14 @@ namespace Server
             switch (type)
             {
                 case 0:
-                    Velocity = 1;
+                    Velocity = 0.75f;
                     MaxTurnV = 0.75f;
                     gunShot = DoubleShoot;
                     powerUp = SpeedUp;
                     break;
                 case 1:
-                    Velocity = 1.25f;
-                    MaxTurnV = 1.25f;
+                    Velocity = 1.5f;
+                    MaxTurnV = 1.5f;
                     gunShot = Shot;
                     powerUp = Jump;
                     break;
@@ -105,8 +105,8 @@ namespace Server
         {
             var b1 = MakeBullet(0.2f);
             var b2 = MakeBullet(-0.2f);
-            b2.Dir = (DirV2 - DirV2.PerpendicularL * 0.1f).Dir();
-            b1.Dir = (DirV2 + DirV2.PerpendicularL * 0.1f).Dir();
+            b2.Dir = Dir; // (DirV2 - DirV2.PerpendicularL * 0.1f).Dir();
+            b1.Dir = Dir; // (DirV2 + DirV2.PerpendicularL * 0.1f).Dir();
             Room.AddObject(b1);
             Room.AddObject(b2);
         }

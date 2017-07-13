@@ -43,7 +43,7 @@ namespace Server
                 {
                     items++;
                     var obj = g();
-                    obj.ID = "Lightning/" + items;
+                    obj.ID = obj.Type + "/" + items;
                     obj.Pos = GenSpaceLeftTop + Utils.RandomVec2(GenSpaceSize);
                     obj.Dir = 0;
                     cb(obj);

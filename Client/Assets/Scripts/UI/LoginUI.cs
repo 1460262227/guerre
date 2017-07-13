@@ -12,6 +12,15 @@ public class LoginUI : UIBase {
     public Text Pwd;
     public Text Tips;
 
+    public UIBase RebornUI;
+    public UIBase SelAirplaneUI;
+
+    private void Start()
+    {
+        RebornUI.Hide();
+        SelAirplaneUI.Hide();
+    }
+
     // 执行登录操作
     public void OnLogin()
     {
@@ -41,13 +50,15 @@ public class LoginUI : UIBase {
                 if (!ok)
                 {
                     Tips.text = "登录失败";
+                    GameCore.Instance.Me = null;
                     conn.Close();
                 }
                 else
                 {
                     Hide();
+                    SelAirplaneUI.Show();
                     var pi = new PlayerInfo();
-                    pi.ID = acc;
+                    pi.Deserialize(data);
                     GameCore.Instance.Me = pi;
                 }
             }, (connected) =>

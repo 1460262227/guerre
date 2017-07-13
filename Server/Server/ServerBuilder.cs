@@ -108,7 +108,7 @@ namespace Server
             ig.GenSpaceLeftTop = new Vec2(-7.5f, -5);
             ig.GenSpaceSize = new Vec2(15, 10);
             ig.MedicineDensity = 0.02f;
-            ig.CoinDensity = 0.05f;
+            ig.CoinDensity = 0.02f;
             ig.LightningDensity = 0.05f;
             ig.BuildGenDensity();
             gr.IG = ig;

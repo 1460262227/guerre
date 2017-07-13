@@ -22,6 +22,27 @@ namespace Server
         public LoginManager()
         {
             OnOp("login", OnLogin);
+            OnOp("unlock", OnUnlock);
+        }
+
+        // 升级解锁
+        public void OnUnlock(Session s, IReadableBuffer data, IWriteableBuffer buff)
+        {
+            var lv = data.ReadInt();
+            var cost = lv * 10;
+
+            var p = s.Player;
+            var pi = p.PlayerInfo;
+            if (pi.Money >= cost)
+            {
+                pi.Money -= cost;
+                pi.Level = lv;
+                buff.Write(true);
+                buff.Write(pi.Money);
+                buff.Write(pi.Level);
+            }
+            else
+                buff.Write(false);
         }
 
         // 玩家登录
@@ -36,11 +57,16 @@ namespace Server
 
             var s = new Session(id);
             s.Connection = conn;
-            OnLogin(s, id, pwd, (r) => { buff.Write(r); end(); });
+            OnLogin(s, id, pwd, (p, r) =>
+            {
+                buff.Write(r);
+                if (p != null)
+                    p.PlayerInfo.Serialize(buff); end();
+            });
         }
 
         // 玩家登录
-        public void OnLogin(Session s, string id, string pwd, Action<bool> r)
+        public void OnLogin(Session s, string id, string pwd, Action<Player, bool> r)
         {
             PC.Retrieve(id, (p) =>
             {
@@ -59,12 +85,12 @@ namespace Server
                 {
                     s.Player = p;
                     SC[id] = s;
-                    r(true);
+                    r(p, true);
 
                     OnPlayerLogin.SC(p);
                 }
                 else
-                    r(false);
+                    r(null, false);
             });
         }
 
