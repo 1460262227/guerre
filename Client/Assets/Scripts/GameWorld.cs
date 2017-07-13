@@ -358,7 +358,7 @@ public class GameWorld : MonoBehaviour
                 obj.UpdateImmediately();
             });
         });
-        OnOp("SheildOn", (t, data) =>
+        OnOp("ShieldOn", (t, data) =>
         {
             var id = data.ReadString();
             var cmds = RetrieveCmds(t);
