@@ -30,6 +30,9 @@ namespace Guerre
         // 移动速率
         public Fix64 Velocity;
 
+        // 最大移动速率
+        public Fix64 MaxVelocity;
+
         // 最大角速度
         public Fix64 MaxTurnV;
 
@@ -47,6 +50,9 @@ namespace Guerre
 
         // 破坏力
         public Fix64 Power;
+
+        // 充能中
+        public bool powering = false;
 
         // 半径
         Fix64 r;
@@ -112,26 +118,39 @@ namespace Guerre
 
         public virtual void OnTimeElapsed(Fix64 te)
         {
+            if (powering)
+            {
+                if (Mp > 0)
+                    Mp -= te;
+                else
+                    Mp = 0;
+            }
+
             MoveForward(te);
         }
 
         // 沿当前方向移动一段距离
-        public virtual Fix64 MoveForward(Fix64 te)
+        public Fix64 MoveForward(Fix64 te)
         {
+            var dist = te * Velocity;
+
             // 更新角度
             if (TurnV != 0)
             {
-                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, TurnV * te);
+                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, te * TurnV);
                 Dir += da;
             }
 
-            var d = te * Velocity;
+            MoveForwardOnDir(dist);
+            return dist;
+        }
+
+        // 沿当前方向移动
+        public void MoveForwardOnDir(Fix64 d)
+        {
             var dx = MathEx.Cos(Dir) * d;
             var dy = MathEx.Sin(Dir) * d;
-            var dv = new Vec2(dx, dy);
-            Pos += dv;
-
-            return dv.Length;
+            Pos += new Vec2(dx, dy);
         }
 
         public virtual void Init()
@@ -154,6 +173,7 @@ namespace Guerre
                 SyncString(ref ID);
                 SyncString(ref Type);
                 SyncString(ref CollisionType);
+                SyncFix64(ref MaxVelocity);
                 SyncFix64(ref Velocity);
                 SyncFix64(ref MaxTurnV);
                 SyncFix64(ref TurnV);
@@ -161,6 +181,7 @@ namespace Guerre
                 SyncFix64(ref Dir);
                 SyncVec2(ref Turn2Dir);
                 SyncFix64(ref Power);
+                SyncBool(ref powering);
                 SyncFix64(ref r);
                 SyncFix64(ref maxHp);
                 SyncFix64(ref hp);

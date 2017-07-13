@@ -19,10 +19,10 @@ public class MovableObjectController : MonoBehaviour
     public string ID { get { return MO.ID; } }
 
     // 移动速率
-    public Fix64 Velocity { get { return MO.Velocity; } }
+    public Fix64 Velocity { get { return MO.Velocity; } set { MO.Velocity = value; } }
 
     // 最大角速度
-    public Fix64 MaxTurnV { get { return MO.MaxTurnV; } }
+    public Fix64 MaxTurnV { get { return MO.MaxTurnV; } set { MO.MaxTurnV = value; } }
 
     // 角速度
     public virtual Fix64 TurnV
@@ -36,6 +36,13 @@ public class MovableObjectController : MonoBehaviour
     {
         get { return MO.Turn2Dir; }
         set { MO.Turn2Dir = value; }
+    }
+
+    // 充能状态
+    public bool Powering
+    {
+        get { return MO.powering; }
+        set { MO.powering = value; }
     }
 
     // 当前位置
@@ -108,30 +115,6 @@ public class MovableObjectController : MonoBehaviour
         }
     } Fix64 preTurnV;
 
-    // 沿当前方向移动一段距离
-    public void MoveForward(Fix64 te)
-    {
-        var dist = te * Velocity;
-
-        // 更新角度
-        if (TurnV != 0)
-        {
-            var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, te * TurnV);
-            Dir += da;
-        }
-
-        MoveForwardOnDir(dist);
-        shirfting = true;
-    }
-
-    // 沿当前方向移动
-    public void MoveForwardOnDir(Fix64 d)
-    {
-        var dx = MathEx.Cos(Dir) * d;
-        var dy = MathEx.Sin(Dir) * d;
-        Pos += new Vec2(dx, dy);
-    }
-
     public void UpdateImmediately()
     {
         ShowRotation = Quaternion.Euler(0, 0, (float)(Dir * MathEx.Rad2Deg));
@@ -144,8 +127,8 @@ public class MovableObjectController : MonoBehaviour
     bool shirfting = false;
     public void UpdateSmoothly(float te)
     {
-        if (!shirfting)
-            return;
+        // if (!shirfting)
+        //    return;
 
         var nowDir = ShowRotation.eulerAngles.z * MathEx.Deg2Rad;
         var nowPos = ShowPosition;
@@ -170,5 +153,13 @@ public class MovableObjectController : MonoBehaviour
 
         ShowRotation = Quaternion.Euler(0, 0, (float) (d * MathEx.Rad2Deg));
         ShowPosition = new Vector3((float)p.x, (float)p.y, 0);
+    }
+
+    public void OnTimeElapsed(Fix64 te)
+    {
+        MO.OnTimeElapsed(te);
+        Pos = MO.Pos;
+        Dir = MO.Dir;
+        TurnV = MO.TurnV;
     }
 }

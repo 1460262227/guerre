@@ -13,6 +13,9 @@ namespace Server
         uint BulletNum = 0;
         Action gunShot = null;
 
+        Action powerUp = null;
+        Action powerDown = null;
+
         public override void Init()
         {
             base.Init();
@@ -39,6 +42,8 @@ namespace Server
                     Velocity = 1;
                     MaxTurnV = 0.75f;
                     gunShot = DoubleShoot;
+                    powerUp = SpeedUp;
+                    powerDown = SpeedDown;
                     break;
                 case 1:
                     Velocity = 1.25f;
@@ -60,7 +65,17 @@ namespace Server
                 case "gun":
                     gunShot();
                     break;
+                case "power":
+                    powerUp();
+                    break;
             }
+        }
+
+        public override void OnTimeElapsed(Fix64 te)
+        {
+            base.OnTimeElapsed(te);
+            if (powering && Mp <= 0)
+                powerDown();
         }
 
         // 机枪射击
@@ -103,6 +118,26 @@ namespace Server
             b.Velocity = 5;
             b.RangeLeft = 5;
             Room.AddObject(b);
+        }
+
+        // 加速
+        void SpeedUp()
+        {
+            powering = true;
+            Velocity *= 2;
+            MaxTurnV *= 2;
+            TurnV *= 2;
+            Room.Boardcast("SpeedUp", (buff) => { buff.Write(ID); });
+        }
+
+        // 加速结束
+        void SpeedDown()
+        {
+            powering = false;
+            Velocity /= 2;
+            MaxTurnV /= 2;
+            TurnV /= 2;
+            Room.Boardcast("SpeedDown", (buff) => { buff.Write(ID); });
         }
     }
 }

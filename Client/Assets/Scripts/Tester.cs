@@ -26,9 +26,11 @@ public class Tester : MonoBehaviour {
         a.Pos = Vec2.Zero;
         a.Velocity = 1;
         a.MaxTurnV = 1;
+        a.TurnV = 0;
         a.Dir = MathEx.Up;
         a.Turn2Dir = Vec2.Zero;
         a.Hp = a.MaxHp = 10;
+        a.Mp = a.MaxMp = 10;
         GW.Add(0, a);
 
         StartCoroutine(PushTime(1));

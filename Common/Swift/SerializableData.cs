@@ -94,6 +94,25 @@ namespace Swift
 
         abstract protected void Sync();
 
+        public void SyncBool(ref bool v)
+        {
+            MakeSureSyncing();
+
+            if (isWrite)
+            {
+                w.Write(v);
+            }
+            else
+            {
+                if (IsEnd())
+                {
+                    // 不修改v
+                    return;
+                }
+                v = r.ReadBool();
+            }
+        }
+
         public void SyncInt(ref int v)
         {
             MakeSureSyncing();

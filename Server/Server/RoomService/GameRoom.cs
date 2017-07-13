@@ -234,7 +234,7 @@ namespace Server
         }
 
         // 房间内广播消息
-        void Boardcast(string op, Action<IWriteableBuffer> fun = null)
+        public void Boardcast(string op, Action<IWriteableBuffer> fun = null)
         {
             foreach (var p in players)
                 GRApis.SendMessage(p.ID, op, (buff) => { buff.Write(timeNumber); fun.SC(buff); } );

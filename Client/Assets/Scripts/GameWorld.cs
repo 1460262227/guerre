@@ -155,7 +155,7 @@ public class GameWorld : MonoBehaviour
 
             // 推动物体逻辑
             foreach (var mo in movingObjControllers.Values)
-                mo.MoveForward(FrameSec);
+                mo.OnTimeElapsed(FrameSec);
 
             // 打印调试信息
             //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
@@ -324,6 +324,32 @@ public class GameWorld : MonoBehaviour
         {
             var killer = data.ReadString();
             GameCore.Instance.OnKill(killer, 1);
+        });
+        OnOp("SpeedUp", (t, data) =>
+        {
+            var id = data.ReadString();
+            var cmds = RetrieveCmds(t);
+            cmds.Add(() =>
+            {
+                var obj = movingObjControllers[id];
+                obj.Velocity *= 2;
+                obj.MaxTurnV *= 2;
+                obj.Turn2Dir *= 2;
+                obj.Powering = true;
+            });
+        });
+        OnOp("SpeedDown", (t, data) =>
+        {
+            var id = data.ReadString();
+            var cmds = RetrieveCmds(t);
+            cmds.Add(() =>
+            {
+                var obj = movingObjControllers[id];
+                obj.Velocity /= 2;
+                obj.MaxTurnV /= 2;
+                obj.Turn2Dir /= 2;
+                obj.Powering = false;
+            });
         });
     }
 }
