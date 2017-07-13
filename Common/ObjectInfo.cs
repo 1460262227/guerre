@@ -9,11 +9,11 @@ using Guerre;
 namespace Guerre
 {
     /// <summary>
-    /// 房间内的可移动物体信息
+    /// 房间内的物体信息
     /// </summary>
-    public class MovableObjectInfo : SerializableData
+    public class ObjectInfo : SerializableData
     {
-        public MovableObjectInfo()
+        public ObjectInfo()
         {
             Init();
         }
@@ -27,23 +27,11 @@ namespace Guerre
         // 碰撞类型
         public string CollisionType;
 
-        // 移动速率
-        public Fix64 Velocity;
-
-        // 最大角速度
-        public Fix64 MaxTurnV;
-
-        // 角速度
-        public Fix64 TurnV;
-
         // 当前位置
-        public Vec2 Pos ;
+        public Vec2 Pos;
 
         // 当前方向(沿 x 正方向顺时针，弧度)
         public Fix64 Dir;
-
-        // 要专向的方向
-        public Vec2 Turn2Dir;
 
         // 破坏力
         public Fix64 Power;
@@ -57,12 +45,6 @@ namespace Guerre
         // 血量
         Fix64 hp;
 
-        // 最大能量
-        Fix64 maxMp;
-
-        // 能量
-        Fix64 mp;
-
         // 尺寸半径
         public Fix64 Radius2 { get { return r * r; } }
         public Fix64 Radius
@@ -71,7 +53,7 @@ namespace Guerre
             set { r = value; }
         }
 
-        // 最大生命值
+        // 生命值
         public Fix64 MaxHp
         {
             get { return maxHp; }
@@ -83,20 +65,6 @@ namespace Guerre
         {
             get { return hp; }
             set { hp = value; }
-        }
-
-        // 能量值
-        public virtual Fix64 Mp
-        {
-            get { return mp; }
-            set { mp = value; }
-        }
-
-        // 最大能量值
-        public virtual Fix64 MaxMp
-        {
-            get { return maxMp; }
-            set { maxMp = value; }
         }
 
         // 当前方向的 Vector2 表达
@@ -112,26 +80,6 @@ namespace Guerre
 
         public virtual void OnTimeElapsed(Fix64 te)
         {
-            MoveForward(te);
-        }
-
-        // 沿当前方向移动一段距离
-        public virtual Fix64 MoveForward(Fix64 te)
-        {
-            // 更新角度
-            if (TurnV != 0)
-            {
-                var da = MathEx.CalcDir4Turn2(DirV2, Turn2Dir, TurnV * te);
-                Dir += da;
-            }
-
-            var d = te * Velocity;
-            var dx = MathEx.Cos(Dir) * d;
-            var dy = MathEx.Sin(Dir) * d;
-            var dv = new Vec2(dx, dy);
-            Pos += dv;
-
-            return dv.Length;
         }
 
         public virtual void Init()
@@ -143,8 +91,6 @@ namespace Guerre
             Radius = 0.1f;
             MaxHp = Hp = 1;
             Dir = MathEx.HalfPi;
-            Turn2Dir = Vec2.Zero;
-            TurnV = 0;
         }
 
         protected override void Sync()
@@ -154,18 +100,12 @@ namespace Guerre
                 SyncString(ref ID);
                 SyncString(ref Type);
                 SyncString(ref CollisionType);
-                SyncFix64(ref Velocity);
-                SyncFix64(ref MaxTurnV);
-                SyncFix64(ref TurnV);
                 SyncVec2(ref Pos);
                 SyncFix64(ref Dir);
-                SyncVec2(ref Turn2Dir);
                 SyncFix64(ref Power);
                 SyncFix64(ref r);
                 SyncFix64(ref maxHp);
                 SyncFix64(ref hp);
-                SyncFix64(ref maxMp);
-                SyncFix64(ref mp);
             }
             EndSync();
         }

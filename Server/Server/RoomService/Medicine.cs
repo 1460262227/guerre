@@ -19,6 +19,7 @@ namespace Server
             base.Init();
             Radius = 0.15f;
             Type = "Medicine";
+            CollisionType = "Medicine";
         }
     }
 }

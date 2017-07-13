@@ -121,6 +121,9 @@ namespace Server
             if (IG != null)
                 IG.RandomGen(FrameSec, (obj) => { AddObject(obj); });
 
+            // 检查碰撞
+            ProcessCollision();
+
             // 处理房间内物体逻辑
             ProcessAll(FrameSec);
 
@@ -128,9 +131,6 @@ namespace Server
             //Console.WriteLine("== t == " + timeNumber);
             //foreach (var obj in movableObjs.Values)
             //    Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
-
-            // 检查碰撞
-            ProcessCollision();
 
             // 最后做移除操作
             var toBeRemoved = new List<MovableObjectInfo>();
@@ -189,7 +189,7 @@ namespace Server
                     {
                         var k2 = keys[j];
                         var obj2 = movableObjs[k2];
-                        if (Collider.DoCollision(/* obj1, obj2 */))
+                        if (Collider.DoCollision(obj1, obj2))
                         {
                             needCheck = true;
                             keys.Remove(k2);

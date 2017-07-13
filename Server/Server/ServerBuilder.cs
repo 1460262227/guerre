@@ -105,6 +105,7 @@ namespace Server
             ig.MedicineDensity = 0.05f;
             ig.CoinDensity = 0.1f;
             ig.LightningDensity = 0.05f;
+            ig.BuildGenDensity();
             gr.IG = ig;
 
             var lgMgr = srv.Get<LoginManager>();

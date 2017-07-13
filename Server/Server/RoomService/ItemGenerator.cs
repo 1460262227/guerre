@@ -26,7 +26,7 @@ namespace Server
 
         Dictionary<Func<MovableObject>, float> gens = new Dictionary<Func<MovableObject>, float>();
 
-        public ItemGenerator()
+        public void BuildGenDensity()
         {
             gens[() => new Medicine()] = MedicineDensity;
             gens[() => new Coin()] = CoinDensity;

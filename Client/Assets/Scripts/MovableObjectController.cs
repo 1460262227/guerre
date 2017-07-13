@@ -13,7 +13,7 @@ using Guerre;
 /// </summary>
 public class MovableObjectController : MonoBehaviour
 {
-    public MovableObjectInfo MO { private get; set; }
+    public MovableObjectInfo MO { get; set; }
 
     // 唯一 ID
     public string ID { get { return MO.ID; } }
@@ -55,9 +55,11 @@ public class MovableObjectController : MonoBehaviour
     public Vec2 PrePos { set { prePos = value; } }
     Vec2 prePos;
 
-    public virtual Fix64 Hp { get { return MO.Hp; } }
-    public Fix64 MaxHp { get { return MO.MaxHp; } }
-    public Fix64 Power { get { return MO.Power; } }
+    public virtual Fix64 Hp { get { return MO.Hp; } set { MO.Hp = value; } }
+    public virtual Fix64 MaxHp { get { return MO.MaxHp; } set { MO.MaxHp = value; } }
+    public virtual Fix64 Mp { get { return MO.Mp; } set { MO.Mp = value; } }
+    public virtual Fix64 MaxMp { get { return MO.MaxMp; } set { MO.MaxMp = value; } }
+    public virtual Fix64 Power { get { return MO.Power; } set { MO.Power = value; } }
 
     // 当前方向(沿 x 正方向顺时针，弧度)
     public Fix64 Dir

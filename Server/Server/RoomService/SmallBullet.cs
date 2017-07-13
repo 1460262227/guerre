@@ -30,6 +30,7 @@ namespace Server
             MaxHp = Hp = 1;
             RangeLeft = 1;
             Type = "SmallBullet";
+            CollisionType = "Bullet";
         }
 
         // 沿当前方向移动一段距离

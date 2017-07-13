@@ -16,12 +16,15 @@ namespace Server
         public override void Init()
         {
             base.Init();
+            CollisionType = "Airplane";
         }
 
         public void BuildAttrs(int type)
         {
             MaxHp = 10;
             Hp = 10;
+            MaxMp = 10;
+            Mp = 5;
             Power = 10;
             Radius = 0.3f;
             Type = "Airplane/" + type;
@@ -35,7 +38,7 @@ namespace Server
                 case 0:
                     Velocity = 1;
                     MaxTurnV = 0.75f;
-                    gunShot = TripleShoot;
+                    gunShot = DoubleShoot;
                     break;
                 case 1:
                     Velocity = 1.25f;
@@ -67,7 +70,7 @@ namespace Server
             var b = new SmallBullet();
             b.ID = ID + "/bullet/" + BulletNum;
             b.OwnerID = ID;
-            b.Pos = Pos; // + DirV2 * 0.35f + DirV2.PerpendicularL * leftOffset;
+            b.Pos = Pos + DirV2 * 0.35f + DirV2.PerpendicularL * leftOffset;
             b.Dir = Dir;
             b.RangeLeft = 3;
             b.Velocity = 3;
@@ -83,15 +86,12 @@ namespace Server
         }
         
         // 双发
-        void TripleShoot()
+        void DoubleShoot()
         {
-            var b0 = MakeBullet(0);
             var b1 = MakeBullet(0.2f);
             var b2 = MakeBullet(-0.2f);
-            b0.Dir = Dir;
             b2.Dir = (DirV2 - DirV2.PerpendicularL * 0.1f).Dir();
             b1.Dir = (DirV2 + DirV2.PerpendicularL * 0.1f).Dir();
-            Room.AddObject(b0);
             Room.AddObject(b1);
             Room.AddObject(b2);
         }

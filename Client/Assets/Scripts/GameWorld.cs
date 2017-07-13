@@ -253,7 +253,7 @@ public class GameWorld : MonoBehaviour
         {
             var obj1 = movingObjControllers[id1];
             var obj2 = movingObjControllers[id2];
-            Guerre.Collider.DoCollision(/* obj1, obj2 */);
+            Guerre.Collider.DoCollision(obj1.MO, obj2.MO);
         });
     }
 
@@ -280,6 +280,7 @@ public class GameWorld : MonoBehaviour
             var objs = new MovableObjectInfo[cnt];
             FC.For(cnt, (i) =>
             {
+                objs[i] = new MovableObjectInfo();
                 objs[i].Deserialize(data);
             });
 
