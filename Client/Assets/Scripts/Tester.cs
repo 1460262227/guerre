@@ -22,7 +22,8 @@ public class Tester : MonoBehaviour {
 
         var a = new MovableObjectInfo();
         a.ID = me.ID;
-        a.Type = "Airplane/0";
+        a.Type = "Airplane";
+        a.Level = 0;
         a.Pos = Vec2.Zero;
         a.Velocity = 1;
         a.MaxTurnV = 1;

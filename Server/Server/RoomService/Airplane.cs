@@ -106,8 +106,8 @@ namespace Server
         {
             var b1 = MakeBullet(0.2f);
             var b2 = MakeBullet(-0.2f);
-            b2.Dir = Dir; // (DirV2 - DirV2.PerpendicularL * 0.1f).Dir();
-            b1.Dir = Dir; // (DirV2 + DirV2.PerpendicularL * 0.1f).Dir();
+            b2.Dir = (DirV2 - DirV2.PerpendicularL * 0.05f).Dir();
+            b1.Dir = (DirV2 + DirV2.PerpendicularL * 0.05f).Dir();
             Room.AddObject(b1);
             Room.AddObject(b2);
         }
