@@ -8,6 +8,7 @@ public class StatisticsUI : MonoBehaviour {
 
     public Text[] Ranks;
     public Text MyKills;
+    public Text MyMoney;
 
     // 击杀和被击杀统计
     Dictionary<string, int> Kills = new Dictionary<string, int>();
@@ -23,6 +24,13 @@ public class StatisticsUI : MonoBehaviour {
         };
     }
 
+    private void Update()
+    {
+        var gc = GameCore.Instance;
+        MyKills.text = gc.MyKills.ToString();
+        MyMoney.text = gc.Me == null ? "0" : gc.Me.Money.ToString();
+    }
+
     public void OnKill(string killer, int n)
     {
         var gc = GameCore.Instance;
@@ -36,9 +44,6 @@ public class StatisticsUI : MonoBehaviour {
         });
 
         if (killer == gc.Me.ID)
-        {
             gc.MyKills += n;
-            MyKills.text = gc.MyKills.ToString();
-        }
     }
 }

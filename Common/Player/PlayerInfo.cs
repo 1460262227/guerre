@@ -14,6 +14,8 @@ namespace Guerre
         public string Name;
         public string PWD;
 
+        public int Money;
+
         protected override void Sync()
         {
             BeginSync();
@@ -21,6 +23,7 @@ namespace Guerre
                 SyncString(ref ID);
                 SyncString(ref Name);
                 SyncString(ref PWD);
+                SyncInt(ref Money);
             }
             EndSync();
         }

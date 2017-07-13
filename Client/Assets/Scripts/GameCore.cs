@@ -30,6 +30,8 @@ public class GameCore : Core
         Add("MessageHandler", mm);
         APIs.Send = mm.Send;
         APIs.Request = mm.Request;
+
+        Collider.GetPlayerInfo = (id) => (Me != null && id == Me.ID) ? Me : null;
     }
 
     // 连接服务器

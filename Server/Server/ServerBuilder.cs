@@ -48,6 +48,9 @@ namespace Server
             // 房间管理
             BuildGameRoomModule(srv, sc);
 
+            // 碰撞模块
+            BuildCollisionModule(srv, sc);
+
             // 所有初始化完成后，启动服务器的网络监听
             log.Info("server started at port: " + port);
             nc.StartListening(ip, port);
@@ -135,6 +138,12 @@ namespace Server
 
                 lgMgr.OnLogout(s, r);
             };
+        }
+
+        // 碰撞模块
+        static void BuildCollisionModule(Server srv, SessionContainer sc)
+        {
+            Collider.GetPlayerInfo = (id) => sc[id].Player.PlayerInfo;
         }
     }
 }
