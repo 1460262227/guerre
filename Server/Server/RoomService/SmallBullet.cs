@@ -33,8 +33,7 @@ namespace Server
             CollisionType = "Bullet";
         }
 
-        // 沿当前方向移动一段距离
-        public override void OnTimeElapsed(Fix64 te)
+        public override void ProcessMove(Fix64 te)
         {
             var d = MoveForward(te);
             RangeLeft -= d;

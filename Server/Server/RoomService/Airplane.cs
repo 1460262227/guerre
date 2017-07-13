@@ -71,9 +71,9 @@ namespace Server
             }
         }
 
-        public override void OnTimeElapsed(Fix64 te)
+        public override void ProcessLogic(Fix64 te)
         {
-            base.OnTimeElapsed(te);
+            base.ProcessLogic(te);
             if (powering && Mp <= 0)
                 powerDown();
         }
@@ -138,6 +138,7 @@ namespace Server
             MaxTurnV /= 2;
             TurnV /= 2;
             Room.Boardcast("SpeedDown", (buff) => { buff.Write(ID); });
+            Console.WriteLine("Power Down");
         }
     }
 }

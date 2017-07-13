@@ -127,8 +127,8 @@ public class MovableObjectController : MonoBehaviour
     bool shirfting = false;
     public void UpdateSmoothly(float te)
     {
-        // if (!shirfting)
-        //    return;
+        if (!shirfting)
+            return;
 
         var nowDir = ShowRotation.eulerAngles.z * MathEx.Deg2Rad;
         var nowPos = ShowPosition;
@@ -155,11 +155,17 @@ public class MovableObjectController : MonoBehaviour
         ShowPosition = new Vector3((float)p.x, (float)p.y, 0);
     }
 
-    public void OnTimeElapsed(Fix64 te)
+    public void ProcessLogic(Fix64 te)
     {
-        MO.OnTimeElapsed(te);
+        MO.ProcessLogic(te);
+    }
+
+    public void ProcessMove(Fix64 te)
+    {
+        MO.ProcessMove(te);
         Pos = MO.Pos;
         Dir = MO.Dir;
         TurnV = MO.TurnV;
+        shirfting = true;
     }
 }

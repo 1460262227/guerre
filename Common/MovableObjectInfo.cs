@@ -116,7 +116,7 @@ namespace Guerre
             set { Dir = value.Dir(); }
         }
 
-        public virtual void OnTimeElapsed(Fix64 te)
+        public virtual void ProcessLogic(Fix64 te)
         {
             if (powering)
             {
@@ -125,7 +125,10 @@ namespace Guerre
                 else
                     Mp = 0;
             }
+        }
 
+        public virtual void ProcessMove(Fix64 te)
+        {
             MoveForward(te);
         }
 

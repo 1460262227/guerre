@@ -143,7 +143,7 @@ public class GameWorld : MonoBehaviour
 
         timeElapsed += (int)(te * 1000);
 
-        // // 固定间隔时间处理一次指令，处理至少一条服务器指令
+        // 固定间隔时间处理一次指令，处理至少一条服务器指令
         while (commanders.Count > curCmdIndex + 1 && timeElapsed >= FrameMS)
         {
             // 推动物体平滑表现
@@ -153,14 +153,22 @@ public class GameWorld : MonoBehaviour
             // 处理指令
             ProcessCommands();
 
-            // 推动物体逻辑
-            foreach (var mo in movingObjControllers.Values)
-                mo.OnTimeElapsed(FrameSec);
-
             // 打印调试信息
-            //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
-            //foreach (var obj in movingObjs.Values)
-            //    Debug.Log("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+            // Debug.Log("== t == " + (curCmdIndex + timeNumBase));
+
+            // 推动物体逻辑
+            foreach (var mc in movingObjControllers.Values)
+            {
+                mc.ProcessLogic(FrameSec);
+
+                //if (mc.MO.CollisionType == "Airplane")
+                //    Debug.Log("v = " + mc.Velocity);
+
+                mc.ProcessMove(FrameSec);
+
+                //if (mc.MO.CollisionType == "Airplane")
+                //    Debug.Log(" " + mc.ID + ": (" + mc.Pos.x + ", " + mc.Pos.y + ") : " + mc.Dir);
+            }
 
             timeElapsed -= FrameMS;
             curCmdIndex++;
@@ -253,7 +261,8 @@ public class GameWorld : MonoBehaviour
         {
             var obj1 = movingObjControllers[id1];
             var obj2 = movingObjControllers[id2];
-            Guerre.Collider.DoCollision(obj1.MO, obj2.MO);
+            if (!Guerre.Collider.DoCollision(obj1.MO, obj2.MO))
+                throw new Exception("detect collision disparity !! " + obj1.MO.CollisionType + " <=> " + obj2.MO.CollisionType);
         });
     }
 
@@ -349,6 +358,7 @@ public class GameWorld : MonoBehaviour
                 obj.MaxTurnV /= 2;
                 obj.Turn2Dir /= 2;
                 obj.Powering = false;
+                Debug.Log("Power Down");
             });
         });
     }

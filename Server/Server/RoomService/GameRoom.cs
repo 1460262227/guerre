@@ -127,12 +127,7 @@ namespace Server
             // 处理房间内物体逻辑
             ProcessAll(FrameSec);
 
-            // 打印调试信息
-            //Console.WriteLine("== t == " + timeNumber);
-            //foreach (var obj in movableObjs.Values)
-            //    Console.WriteLine("  " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
-
-            // 最后做移除操作
+            // 最后做移除操作`
             var toBeRemoved = new List<MovableObjectInfo>();
             foreach (var k in movableObjs.Keys.ToArray())
             {
@@ -152,8 +147,21 @@ namespace Server
         // 处理房间内物体逻辑
         void ProcessAll(Fix64 te)
         {
+            // 打印调试信息
+            // Console.WriteLine("== t == " + timeNumber);
+
             foreach (var obj in movableObjs.Values)
-                obj.OnTimeElapsed(te);
+            {
+                obj.ProcessLogic(te);
+
+                //if (obj.CollisionType == "Airplane")
+                //    Console.WriteLine("v = " + obj.Velocity);
+
+                obj.ProcessMove(te);
+
+                //if (obj.CollisionType == "Airplane")
+                //    Console.WriteLine(" " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
+            }
         }
 
         // 刷新击杀统计
