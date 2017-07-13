@@ -72,11 +72,6 @@ namespace Server
             }
         }
 
-        public override void ProcessLogic(Fix64 te)
-        {
-            base.ProcessLogic(te);
-        }
-
         #region 射击
 
         // 机枪射击
@@ -128,6 +123,9 @@ namespace Server
         // 加速
         new void SpeedUp()
         {
+            if (Mp <= 0)
+                return;
+
             base.SpeedUp();
             Mp = 0;
             Room.Boardcast("SpeedUp", (buff) => { buff.Write(ID); });
@@ -136,6 +134,9 @@ namespace Server
         // 跳跃
         void Jump()
         {
+            if (Mp <= 0)
+                return;
+
             var dist = MathEx.Sqrt(Mp);
             MoveForwardOnDir(dist);
             Mp = 0;
@@ -145,6 +146,9 @@ namespace Server
         // 开盾
         void ShieldOn()
         {
+            if (Mp <= 0)
+                return;
+
             Sheild = Mp;
             Mp = 0;
             Room.Boardcast("ShieldOn", (buff) => { buff.Write(ID); });

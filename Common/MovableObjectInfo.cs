@@ -124,6 +124,7 @@ namespace Guerre
 
         public virtual void ProcessLogic(Fix64 te)
         {
+            // 减加速状态
             if (Speeding > 0)
             {
                 Speeding -= te;
@@ -131,6 +132,7 @@ namespace Guerre
                     SpeedDown();
             }
 
+            // 减盾
             if (Sheild > 0)
                 Sheild -= te;
         }

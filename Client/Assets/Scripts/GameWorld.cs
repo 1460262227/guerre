@@ -13,6 +13,9 @@ public class GameWorld : MonoBehaviour
     public static float FrameSec = 0.05f;
     public static int FrameMS = (int)(FrameSec * 1000);
 
+    // 特效生成
+    public EffectCreator EC;
+
     // 场景根节点
     public Transform SceneRoot = null;
 
@@ -377,9 +380,13 @@ public class GameWorld : MonoBehaviour
             cmds.Add(() =>
             {
                 var obj = movingObjControllers[id];
+                var from = obj.Pos;
                 obj.MoveForwardOnDir(MathEx.Sqrt(obj.Mp));
                 obj.Mp = 0;
                 obj.UpdateImmediately();
+                var to = obj.Pos;
+
+                EC.AirplaneGhost(obj.Level, from, to, 0.5f);
             });
         });
         OnOp("ShieldOn", (t, data) =>
@@ -392,6 +399,8 @@ public class GameWorld : MonoBehaviour
                 obj.Sheild = obj.Mp;
                 obj.Mp = 0;
                 obj.UpdateImmediately();
+
+                EC.AirplaneShield(obj);
             });
         });
     }

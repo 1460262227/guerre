@@ -100,8 +100,9 @@ namespace Guerre
 
                 // 执行碰撞逻辑
                 m.Hp = 0;
-                if (a.Hp < a.MaxHp)
-                    a.Hp = a.Hp + 1;
+                a.Hp = a.Hp + 1;
+                if (a.Hp > a.MaxHp)
+                    a.Hp = a.MaxHp;
 
                 return true;
             };
@@ -121,9 +122,13 @@ namespace Guerre
                 else if (a.Sheild > 0)
                     a.Sheild += 1;
                 else if (a.Mp < a.MaxHp)
+                {
                     a.Mp = a.Mp + 1;
+                    if (a.Mp > a.MaxMp)
+                        a.Mp = a.MaxMp;
+                }
 
-                return true;
+                    return true;
             };
 
             // SafeArea => airplane

@@ -11,9 +11,11 @@ public class Tester : MonoBehaviour {
     public ControlHandler CH = null;
     public GameWorld GW = null;
     public Joystick JS = null;
+    public AirplaneGhost Ghost = null;
+    public EffectCreator EC = null;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         LoginUIObj.SetActive(false);
         CH.enabled = false;
         var me = new PlayerInfo();
@@ -25,7 +27,7 @@ public class Tester : MonoBehaviour {
         a.Type = "Airplane";
         a.Level = 0;
         a.Pos = Vec2.Zero;
-        a.Velocity = 1;
+        a.Velocity = 1f;
         a.MaxTurnV = 1;
         a.TurnV = 0;
         a.Dir = MathEx.Up;
