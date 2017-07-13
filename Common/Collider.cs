@@ -62,8 +62,12 @@ namespace Guerre
                 if (onlyCheck || !overlapped)
                     return overlapped;
 
-                // 执行碰撞逻辑
-                a.Hp -= b.Power;
+                // 先扣盾，再扣血
+                if (a.Sheild > 0)
+                    a.Sheild -= b.Power;
+                else
+                    a.Hp -= b.Power;
+
                 b.Hp = 0;
 
                 return true;
@@ -107,9 +111,14 @@ namespace Guerre
                 if (onlyCheck || !overlapped)
                     return overlapped;
 
-                // 执行碰撞逻辑
-                if (a.Mp < a.MaxHp)
+                // 有盾有加速就直接加上去
+                if (a.Speeding > 0)
+                    a.Speeding += 1;
+                else if (a.Sheild > 0)
+                    a.Sheild += 1;
+                else if (a.Mp < a.MaxHp)
                     a.Mp = a.Mp + 1;
+
                 l.Hp = 0;
 
                 return true;

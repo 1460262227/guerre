@@ -159,7 +159,7 @@ namespace Server
 
                 obj.ProcessMove(te);
 
-                //if (obj.CollisionType == "Airplane")
+                // if (obj.CollisionType == "Airplane")
                 //  Console.WriteLine(" " + obj.ID + ": (" + obj.Pos.x + ", " + obj.Pos.y + ") : " + obj.Dir);
             }
         }

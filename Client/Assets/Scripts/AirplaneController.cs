@@ -46,7 +46,8 @@ public class AirplaneController : MovableObjectController
 
     public void RefreshMpBar()
     {
-        var r = (float)(Mp / MaxMp);
+        var v = (Speeding > 0 ? Speeding : (Sheild > 0 ? Sheild : Mp));
+        var r = (float)(v / MaxMp);
         MpBar.localScale = new Vector3(r, 1, 1);
         MpBar.localPosition = new Vector3(-(1 - r) / 4, 0, 0);
     }

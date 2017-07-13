@@ -14,7 +14,6 @@ namespace Server
         Action gunShot = null;
 
         Action powerUp = null;
-        Action powerDown = null;
 
         public override void Init()
         {
@@ -43,7 +42,6 @@ namespace Server
                     MaxTurnV = 0.75f;
                     gunShot = DoubleShoot;
                     powerUp = SpeedUp;
-                    powerDown = SpeedDown;
                     break;
                 case 1:
                     Velocity = 1.25f;
@@ -55,6 +53,7 @@ namespace Server
                     Velocity = 1;
                     MaxTurnV = 1;
                     gunShot = LongShot;
+                    powerUp = ShieldOn;
                     break;
             }
         }
@@ -75,8 +74,6 @@ namespace Server
         public override void ProcessLogic(Fix64 te)
         {
             base.ProcessLogic(te);
-            if (powering && Mp <= 0)
-                powerDown();
         }
 
         #region 射击
@@ -128,24 +125,11 @@ namespace Server
         #region 特殊技
 
         // 加速
-        void SpeedUp()
+        new void SpeedUp()
         {
-            powering = true;
-            Velocity *= 2;
-            MaxTurnV *= 2;
-            TurnV *= 2;
+            base.SpeedUp();
+            Mp = 0;
             Room.Boardcast("SpeedUp", (buff) => { buff.Write(ID); });
-        }
-
-        // 加速结束
-        void SpeedDown()
-        {
-            powering = false;
-            Velocity /= 2;
-            MaxTurnV /= 2;
-            TurnV /= 2;
-            Room.Boardcast("SpeedDown", (buff) => { buff.Write(ID); });
-            // Console.WriteLine("Power Down");
         }
 
         // 跳跃
@@ -155,6 +139,14 @@ namespace Server
             MoveForwardOnDir(dist);
             Mp = 0;
             Room.Boardcast("Jump", (buff) => { buff.Write(ID); });
+        }
+
+        // 开盾
+        void ShieldOn()
+        {
+            Sheild = Mp;
+            Mp = 0;
+            Room.Boardcast("ShieldOn", (buff) => { buff.Write(ID); });
         }
 
         #endregion

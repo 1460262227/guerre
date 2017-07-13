@@ -167,7 +167,7 @@ public class GameWorld : MonoBehaviour
 
                 mc.ProcessMove(FrameSec);
 
-                //if (mc.MO.CollisionType == "Airplane")
+                // if (mc.MO.CollisionType == "Airplane")
                 //  Debug.Log(" " + mc.ID + ": (" + mc.Pos.x + ", " + mc.Pos.y + ") : " + mc.Dir);
             }
 
@@ -342,24 +342,8 @@ public class GameWorld : MonoBehaviour
             cmds.Add(() =>
             {
                 var obj = movingObjControllers[id];
-                obj.Velocity *= 2;
-                obj.MaxTurnV *= 2;
-                obj.Turn2Dir *= 2;
-                obj.Powering = true;
-            });
-        });
-        OnOp("SpeedDown", (t, data) =>
-        {
-            var id = data.ReadString();
-            var cmds = RetrieveCmds(t);
-            cmds.Add(() =>
-            {
-                var obj = movingObjControllers[id];
-                obj.Velocity /= 2;
-                obj.MaxTurnV /= 2;
-                obj.Turn2Dir /= 2;
-                obj.Powering = false;
-                // Debug.Log("Power Down");
+                obj.SpeedUp();
+                obj.Mp = 0;
             });
         });
         OnOp("Jump", (t, data) =>
@@ -370,6 +354,18 @@ public class GameWorld : MonoBehaviour
             {
                 var obj = movingObjControllers[id];
                 obj.MoveForwardOnDir(MathEx.Sqrt(obj.Mp));
+                obj.Mp = 0;
+                obj.UpdateImmediately();
+            });
+        });
+        OnOp("SheildOn", (t, data) =>
+        {
+            var id = data.ReadString();
+            var cmds = RetrieveCmds(t);
+            cmds.Add(() =>
+            {
+                var obj = movingObjControllers[id];
+                obj.Sheild = obj.Mp;
                 obj.Mp = 0;
                 obj.UpdateImmediately();
             });

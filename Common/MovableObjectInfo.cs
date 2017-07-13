@@ -51,8 +51,11 @@ namespace Guerre
         // 破坏力
         public Fix64 Power;
 
-        // 充能中
-        public bool powering = false;
+        // 剩余盾值
+        public Fix64 Sheild;
+
+        // 剩余加速值
+        public Fix64 Speeding;
 
         // 半径
         Fix64 r;
@@ -118,13 +121,15 @@ namespace Guerre
 
         public virtual void ProcessLogic(Fix64 te)
         {
-            if (powering)
+            if (Speeding > 0)
             {
-                if (Mp > 0)
-                    Mp -= te;
-                else
-                    Mp = 0;
+                Speeding -= te;
+                if (Speeding <= 0)
+                    SpeedDown();
             }
+
+            if (Sheild > 0)
+                Sheild -= te;
         }
 
         public virtual void ProcessMove(Fix64 te)
@@ -184,14 +189,30 @@ namespace Guerre
                 SyncFix64(ref Dir);
                 SyncVec2(ref Turn2Dir);
                 SyncFix64(ref Power);
-                SyncBool(ref powering);
                 SyncFix64(ref r);
+                SyncFix64(ref Sheild);
+                SyncFix64(ref Speeding);
                 SyncFix64(ref maxHp);
                 SyncFix64(ref hp);
                 SyncFix64(ref maxMp);
                 SyncFix64(ref mp);
             }
             EndSync();
+        }
+
+        public void SpeedUp()
+        {
+            Speeding = Mp;
+            Velocity *= 2;
+            MaxTurnV *= 2;
+            Turn2Dir *= 2;
+        }
+
+        public void SpeedDown()
+        {
+            Velocity /= 2;
+            MaxTurnV /= 2;
+            Turn2Dir /= 2;
         }
     }
 }

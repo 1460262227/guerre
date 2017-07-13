@@ -38,13 +38,6 @@ public class MovableObjectController : MonoBehaviour
         set { MO.Turn2Dir = value; }
     }
 
-    // 充能状态
-    public bool Powering
-    {
-        get { return MO.powering; }
-        set { MO.powering = value; }
-    }
-
     // 当前位置
     public Vec2 Pos
     {
@@ -67,6 +60,13 @@ public class MovableObjectController : MonoBehaviour
     public virtual Fix64 Mp { get { return MO.Mp; } set { MO.Mp = value; } }
     public virtual Fix64 MaxMp { get { return MO.MaxMp; } set { MO.MaxMp = value; } }
     public virtual Fix64 Power { get { return MO.Power; } set { MO.Power = value; } }
+    public virtual Fix64 Sheild { get { return MO.Sheild; } set { MO.Sheild = value; } }
+    public virtual Fix64 Speeding { get { return MO.Speeding; } set { MO.Speeding = value; } }
+
+    public void SpeedUp()
+    {
+        MO.SpeedUp();
+    }
 
     // 当前方向(沿 x 正方向顺时针，弧度)
     public Fix64 Dir
