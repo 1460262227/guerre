@@ -57,12 +57,8 @@ public class GameWorld : MonoBehaviour
         // 添加模型
         GameObject go = null;
 
-        if (type == "Airplane/0")
+        if (type == "Airplane")
             go = Instantiate(AirplaneModels[0].gameObject) as GameObject;
-        else if (type == "Airplane/1")
-            go = Instantiate(AirplaneModels[1].gameObject) as GameObject;
-        else if (type == "Airplane/2")
-            go = Instantiate(AirplaneModels[2].gameObject) as GameObject;
         else if (type == "SmallBullet")
             go = Instantiate(BulletModels[0].gameObject) as GameObject;
         else if (type == "Medicine")
@@ -74,12 +70,12 @@ public class GameWorld : MonoBehaviour
         else
             throw new Exception("unknown object type: " + type);
 
-        go.SetActive(true);
-        go.transform.SetParent(SceneRoot, false);
-
         // 设置属性
         var oc = go.GetComponent<MovableObjectController>();
         oc.MO = obj;
+        go.SetActive(true);
+        go.transform.SetParent(SceneRoot, false);
+
         oc.UpdateImmediately();
         movingObjControllers[id] = oc;
 

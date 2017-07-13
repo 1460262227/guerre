@@ -309,12 +309,12 @@ namespace Server
             OnOp("Join", (Session s, IReadableBuffer data) =>
             {
                 var id = s.ID;
-                var typeSel = data.ReadInt();
+                var lv = data.ReadInt();
                 ops.Add(() =>
                 {
                     var a = new Airplane();
                     a.ID = id;
-                    a.BuildAttrs(typeSel);
+                    a.BuildAttrs(lv);
                     AddObject(a);
                 });
             });

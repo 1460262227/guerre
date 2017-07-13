@@ -62,6 +62,7 @@ public class MovableObjectController : MonoBehaviour
     public virtual Fix64 Power { get { return MO.Power; } set { MO.Power = value; } }
     public virtual Fix64 Sheild { get { return MO.Sheild; } set { MO.Sheild = value; } }
     public virtual Fix64 Speeding { get { return MO.Speeding; } set { MO.Speeding = value; } }
+    public virtual int Level { get { return MO.Level; } set { MO.Level = value; } }
 
     public void SpeedUp()
     {
@@ -115,7 +116,7 @@ public class MovableObjectController : MonoBehaviour
         }
     } Fix64 preTurnV;
 
-    public void UpdateImmediately()
+    public virtual void UpdateImmediately()
     {
         ShowRotation = Quaternion.Euler(0, 0, (float)(Dir * MathEx.Rad2Deg));
         ShowPosition = new Vector3((float)Pos.x, (float)Pos.y, 0);

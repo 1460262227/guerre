@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Swift.Math;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// 飞机表现控制
@@ -14,8 +15,12 @@ public class AirplaneController : MovableObjectController
     // 能量条
     Transform MpBar;
 
+    // 国旗
+    public SpriteRenderer NationalFlag;
+
     // 机身
-    public Transform Body;
+    public SpriteRenderer Body;
+    public Transform BodyTransform;
 
     // 机身特殊效果
     public AirplaneSprite AS;
@@ -24,6 +29,10 @@ public class AirplaneController : MovableObjectController
     {
         HpBar = transform.FindChild("Root/HpBar/bar");
         MpBar = transform.FindChild("Root/MpBar/bar");
+
+        var lv = Level;
+        NationalFlag.sprite = Resources.Load<Sprite>("Sprites/National/" + lv.ToString());
+        Body.sprite = Resources.Load<Sprite>("Sprites/Airplanes/" + lv.ToString());
     }
 
     private void LateUpdate()
@@ -52,5 +61,5 @@ public class AirplaneController : MovableObjectController
         MpBar.localPosition = new Vector3(-(1 - r) / 4, 0, 0);
     }
 
-    public override Quaternion ShowRotation { get { return Body.localRotation; } set { Body.localRotation = value; } }
+    public override Quaternion ShowRotation { get { return BodyTransform.localRotation; } set { BodyTransform.localRotation = value; } }
 }

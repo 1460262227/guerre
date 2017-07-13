@@ -24,6 +24,9 @@ namespace Guerre
         // 物体类型
         public string Type;
 
+        // 等级
+        public int Level;
+
         // 碰撞类型
         public string CollisionType;
 
@@ -163,6 +166,7 @@ namespace Guerre
 
         public virtual void Init()
         {
+            Level = 0;
             Type = null;
             CollisionType = null;
             Power = 0;
@@ -179,6 +183,7 @@ namespace Guerre
             BeginSync();
             {
                 SyncString(ref ID);
+                SyncInt(ref Level);
                 SyncString(ref Type);
                 SyncString(ref CollisionType);
                 SyncFix64(ref MaxVelocity);
