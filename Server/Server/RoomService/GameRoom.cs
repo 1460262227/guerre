@@ -128,7 +128,10 @@ namespace Server
 
             // 物品生成
             if (IG != null)
+            {
+                IG.RefreshItemStatistics();
                 IG.RandomGen(FrameSec, (obj) => { AddObject(obj); });
+            }
 
             // 检查碰撞
             ProcessCollision();
