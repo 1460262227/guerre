@@ -100,6 +100,15 @@ namespace Server
             });
         }
 
+        // 临时做个安全区检查，范围外扣血
+        public Vec2 SafeAreaLeftTop;
+        public Vec2 SafeAreaSize;
+        bool InSafeArea(Vec2 pos)
+        {
+            var p = pos - SafeAreaLeftTop;
+            return p.x > 0 && p.x < SafeAreaSize.x && p.y > 0 && p.y < SafeAreaSize.y;
+        }
+
         // 游戏时间流逝
         int timeNumber = 0;
         int timeElapsed = 0;
@@ -126,6 +135,13 @@ namespace Server
 
             // 处理房间内物体逻辑
             ProcessAll(FrameSec);
+
+            // 临时安全区检查
+            foreach (var obj in movableObjs.Values)
+            {
+                if (!InSafeArea(obj.Pos))
+                    obj.Hp -= FrameSec / 2;
+            }
 
             // 最后做移除操作`
             var toBeRemoved = new List<MovableObjectInfo>();
@@ -221,6 +237,10 @@ namespace Server
         {
             GRApis.SendMessage(idTo, "SyncRoom", (buff) =>
             {
+                buff.Write(SafeAreaLeftTop.x);
+                buff.Write(SafeAreaLeftTop.y);
+                buff.Write(SafeAreaSize.x);
+                buff.Write(SafeAreaSize.y);
                 buff.Write(timeNumber);
 
                 // 房间内物体信息

@@ -14,6 +14,10 @@ public class ControlHandler : MonoBehaviour
     bool pressedLasttime = false;
 	void Update ()
     {
+        var mc = GameCore.Instance.MeOC;
+        if (mc == null)
+            return;
+
         if (!JS.Pressed)
         {
             if (pressedLasttime)
@@ -29,10 +33,9 @@ public class ControlHandler : MonoBehaviour
         var dirV2 = JS.CurrentPos;
         dirV2.Normalize();
 
-        var TurnV = GameCore.Instance.MeOC.MaxTurnV;
+        var TurnV = mc.MaxTurnV;
         APIs.Send("GameRoom/test", "Turn2", (buff) => { buff.Write(dirV2.x); buff.Write(dirV2.y); buff.Write(TurnV); });
-        var mc = GameCore.Instance.MeOC;
-
+       
         // 提前一帧
         var dt = 0.05f;
         var dd = MathEx.CalcDir4Turn2(mc.DirV2, dirV2, TurnV * dt);

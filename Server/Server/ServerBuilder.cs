@@ -102,6 +102,8 @@ namespace Server
 
             // add a test room
             var gr = grMgr.CreateNewRoom("test");
+            gr.SafeAreaLeftTop = new Vec2(-7.5f, -5);
+            gr.SafeAreaSize = new Vec2(15, 10);
             var ig = new ItemGenerator();
             ig.GenSpaceLeftTop = new Vec2(-7.5f, -5);
             ig.GenSpaceSize = new Vec2(15, 10);

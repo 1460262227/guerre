@@ -16,6 +16,9 @@ public class GameWorld : MonoBehaviour
     // 场景根节点
     public Transform SceneRoot = null;
 
+    // 场景背景
+    public SpriteRenderer BGR = null;
+
     // 飞机模型
     public GameObject[] AirplaneModels = null;
 
@@ -157,7 +160,7 @@ public class GameWorld : MonoBehaviour
             // 打印调试信息
             //Debug.Log("== t == " + (curCmdIndex + timeNumBase));
 
-            // 推动物体逻辑
+            // 推动物体
             foreach (var mc in movingObjControllers.Values)
             {
                 mc.ProcessLogic(FrameSec);
@@ -169,6 +172,13 @@ public class GameWorld : MonoBehaviour
 
                 // if (mc.MO.CollisionType == "Airplane")
                 //  Debug.Log(" " + mc.ID + ": (" + mc.Pos.x + ", " + mc.Pos.y + ") : " + mc.Dir);
+            }
+
+            // 临时安全区检查
+            foreach (var obj in movingObjControllers.Values)
+            {
+                if (!InSafeArea(obj.Pos))
+                    obj.Hp -= FrameSec / 2;
             }
 
             timeElapsed -= FrameMS;
@@ -267,6 +277,15 @@ public class GameWorld : MonoBehaviour
         });
     }
 
+    // 临时做个安全区检查，范围外扣血
+    public Vec2 SafeAreaLeftTop;
+    public Vec2 SafeAreaSize;
+    bool InSafeArea(Vec2 pos)
+    {
+        var p = pos - SafeAreaLeftTop;
+        return p.x > 0 && p.x < SafeAreaSize.x && p.y > 0 && p.y < SafeAreaSize.y;
+    }
+
     #endregion
 
     void OnOp(string op, Action<int, IReadableBuffer> cb)
@@ -285,6 +304,15 @@ public class GameWorld : MonoBehaviour
         var mh = GameCore.Instance.Get<MessageHandler>();
         mh.OnOp("GameRoom/SyncRoom", (conn, data) =>
         {
+            SafeAreaLeftTop.x = data.ReadFix64();
+            SafeAreaLeftTop.y = data.ReadFix64();
+            SafeAreaSize.x = data.ReadFix64();
+            SafeAreaSize.y = data.ReadFix64();
+
+            var lt = SafeAreaSize / 2 + SafeAreaLeftTop;
+            BGR.transform.localPosition = new Vector3((float)lt.x, (float)lt.y, 0);
+            BGR.size = new Vector2((float)SafeAreaSize.x, (float)SafeAreaSize.y);
+
             var t = data.ReadInt();
             var cnt = data.ReadInt();
             var objs = new MovableObjectInfo[cnt];

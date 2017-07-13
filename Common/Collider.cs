@@ -125,6 +125,26 @@ namespace Guerre
 
                 return true;
             };
+
+            // SafeArea => airplane
+            CM["SafeArea"] = new Dictionary<string, Func<MovableObjectInfo, MovableObjectInfo, bool, bool>>();
+            CM["SafeArea"]["Airplane"] = (l, a, onlyCheck) =>
+            {
+                var overlapped = IsOverlapped(l, a);
+                if (onlyCheck || !overlapped)
+                    return overlapped;
+
+                l.Hp = 0;
+                // 有盾有加速就直接加上去
+                if (a.Speeding > 0)
+                    a.Speeding += 1;
+                else if (a.Sheild > 0)
+                    a.Sheild += 1;
+                else if (a.Mp < a.MaxHp)
+                    a.Mp = a.Mp + 1;
+
+                return true;
+            };
         }
 
         #endregion
