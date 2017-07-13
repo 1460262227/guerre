@@ -50,8 +50,8 @@ namespace Server
                     powerUp = Jump;
                     break;
                 case 2:
-                    Velocity = 1;
-                    MaxTurnV = 1;
+                    Velocity = 1.2f;
+                    MaxTurnV = 1.2f;
                     gunShot = LongShot;
                     powerUp = ShieldOn;
                     break;
